@@ -36,9 +36,16 @@ class CrawlerTests {
             
      
             // Add your code here to get the number of crawled pages
+            Crawler curCrawler = new Crawler(seedUrls);
+            try{
+                curCrawler.crawl();
+            } catch(IOException e) {
+                System.out.println(e.toString());
+            }
+
 
             // Get the crawled pages
-            int numPagesCrawled = 0;
+            int numPagesCrawled = curCrawler.getNumPagesCrawled();
             
             
             // Verify that the number of crawled pages is correct, i.e. the same as stated in the JSON file
@@ -56,9 +63,15 @@ class CrawlerTests {
             
 
             // Add your code here to get the number of links
+            Crawler curCrawler = new Crawler(seedUrls);
+            try {
+                curCrawler.crawl();
+            } catch(IOException e) {
+                System.out.println(e.toString());
+            }
 
             // Get the number of links
-            int numLinks = 0;
+            int numLinks = curCrawler.getNumLinks();
    
 
 
