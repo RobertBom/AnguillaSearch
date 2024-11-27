@@ -37,7 +37,7 @@ public class Crawler {
     /** The Seed-URLs, starting point for the crawling process. */
     private String[] seedURLs;
     /** The crawled Pages, already split in title, header and content. */
-    private List<Page> crawledSites = new ArrayList<>();
+    private List<Page> crawledPages = new ArrayList<>();
     /** private ArrayList<String> seedURLs = new ArrayList<>(); */
 
     /*
@@ -95,7 +95,7 @@ public class Crawler {
             doc = Jsoup.connect(curURL).get();
             knownURL.add(curURL);
             Page curSite = (Parser.parse(curURL, doc));
-            crawledSites.add(curSite);
+            crawledPages.add(curSite);
             numPagesCrawled++;
             
             //add all new found links into queue
@@ -127,6 +127,10 @@ public class Crawler {
      */
     public int getNumLinks() {
         return numLinks;
+    }
+
+    public List<Page> getCrawledPages() {
+        return crawledPages;
     }
 
 
