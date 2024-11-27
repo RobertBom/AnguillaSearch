@@ -49,12 +49,14 @@ public class Parser {
     }
 
     /**
-     * Tokenizes the input String.
+     * Tokenizes and lemmatizes the input String.
      * e.g. 
+     * "Welcome to our exquisite selection of artisanal cheeses! Explore the rich flavors and unique textures" will be converted into
+     * ["welcome", "to", "we", "exquisite", "selection", "of", "artisanal", "cheese", "explore", "the", "rich", "flavor", "and", "unique", "texture"]
      * @param content   The String which should be tokenized
      * @return  an ArrayList<String> of the token of content.
      */
-    public static ArrayList<String> tokenize(final String inputString) {
+    public static ArrayList<String> tokLem(final String inputString) {
         ArrayList<String> outputList = new ArrayList<>();
         
         /** the String which we manipulate to get the tokenized and lemmatized result */
@@ -63,7 +65,7 @@ public class Parser {
         //remove StopWords
         workString = rmStopWords(workString);
         //remove punctation marks, 
-        workString = workString.replaceAll("[\\.!,]", "");
+        workString = workString.replaceAll("[\\.!,:]", "");
 
         //create out StanfordCoreNLP Pipeline with the right annotators
         Properties props = new Properties();
@@ -74,7 +76,7 @@ public class Parser {
         CoreDocument coreDoc = new CoreDocument(workString);
         pipeline.annotate(coreDoc);
 
-
+        //create list of lemmas.
         List<CoreLabel> tokenList = coreDoc.tokens();
         for(CoreLabel token : tokenList) {
             outputList.add(token.lemma());
