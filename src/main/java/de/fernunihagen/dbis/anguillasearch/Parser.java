@@ -27,15 +27,16 @@ public class Parser {
 
         String title = page.title();
         String header = page.getElementsByTag("header").text(); 
-        Elements docContent = page.getElementsByTag("main");
-        docContent.select("a").remove();
-        String content = docContent.text();
 
         Elements links = page.getElementsByTag("a");
         ArrayList<String> linkList = new ArrayList<>();
         for (Element curLink : links) {
             linkList.add(curLink.attr("href"));
         }
+
+        Elements docContent = page.getElementsByTag("main");
+        docContent.select("a").remove();
+        String content = docContent.text();
 
         return new Page(url, title, header, content, linkList);
     }
