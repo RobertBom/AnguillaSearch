@@ -27,7 +27,9 @@ public class Parser {
 
         String title = page.title();
         String header = page.getElementsByTag("header").text(); 
-        String content = page.getElementsByTag("main").text();
+        Elements docContent = page.getElementsByTag("main");
+        docContent.select("a").remove();
+        String content = docContent.text();
 
         Elements links = page.getElementsByTag("a");
         ArrayList<String> linkList = new ArrayList<>();
