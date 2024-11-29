@@ -20,6 +20,7 @@ public class Page implements Comparable<Page> {
         this.content = content;
         this.linkList = linkList;
 
+        //tanks performance
         filteredLemmaList.addAll(Parser.tokLem(title));
         filteredLemmaList.addAll(Parser.tokLem(header));
         filteredLemmaList.addAll(Parser.tokLem(content));
