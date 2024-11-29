@@ -1,5 +1,8 @@
 package de.fernunihagen.dbis.anguillasearch;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -16,6 +19,9 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
  * Parser Class which provides several functions.
  */
 public class Parser {
+    /** variable to save the Regex for Stopword Removal, so we don't have to build it only once */
+    private static String stopWordRegex = null;
+
      /**
      * Parses the already fetched page and create a Page-Object, which contains
      * the relevant information.
@@ -48,6 +54,26 @@ public class Parser {
     public static String rmStopWords(final String inputString) {
         /** the String we work on */
         String workString = inputString;
+        if (stopWordRegex == null) {
+            try{
+                List<String> stopWords = Files.readAllLines(Paths.get("stopwords.txt"));
+                //create Regex
+                StringBuilder strB = new StringBuilder();
+                strB.append("\\b(");
+                for (String stopword : stopWords) {
+                    strB.append(stopword + "|");
+                }
+                //remove replace last | by )
+                strB.setCharAt(strB.length()-1, ')');
+                strB.append("\\b");
+                stopWordRegex = strB.toString();
+            }
+            catch(IOException e) {
+                System.out.println("Failed to load Stopwordlist.");
+                System.out.println(e.toString());
+            }
+        }
+        workString = workString.replaceAll(stopWordRegex, "");
         return workString;
     }
 
@@ -65,10 +91,12 @@ public class Parser {
         /** the String which we manipulate to get the tokenized and lemmatized result */
         String workString = inputString;
 
+        //remove \, |, and punctiation marks.
+        workString = workString.replaceAll("[\\\\|.!,:-]", "");
+        workString = workString.toLowerCase();
+
         //remove StopWords
         workString = rmStopWords(workString);
-        //remove punctation marks, 
-        workString = workString.replaceAll("[\\.!,:]", "");
 
         //create out StanfordCoreNLP Pipeline with the right annotators
         Properties props = new Properties();
