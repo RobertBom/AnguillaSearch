@@ -37,12 +37,8 @@ class CrawlerTests {
      
             // Add your code here to get the number of crawled pages
             Crawler curCrawler = new Crawler(seedUrls);
-            try{
-                curCrawler.crawl();
-            } catch(IOException e) {
-                System.out.println(e.toString());
-            }
-
+            curCrawler.crawl();
+   
 
             // Get the crawled pages
             int numPagesCrawled = curCrawler.getNumPagesCrawled();
@@ -64,11 +60,7 @@ class CrawlerTests {
 
             // Add your code here to get the number of links
             Crawler curCrawler = new Crawler(seedUrls);
-            try {
-                curCrawler.crawl();
-            } catch(IOException e) {
-                System.out.println(e.toString());
-            }
+            curCrawler.crawl();
 
             // Get the number of links
             int numLinks = curCrawler.getNumLinks();
