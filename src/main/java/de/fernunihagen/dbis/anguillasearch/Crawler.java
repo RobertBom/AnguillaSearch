@@ -6,6 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,8 +23,6 @@ import com.google.gson.JsonObject;
  * or by providing a String array with the Seed-URLs directly.
  */
 public class Crawler {
-    /** The path to the Json the crawler was initialized. */
-    private String netJsonPath = "";
     /** The Number of Pages the crawler has crawled. */
     private int numPagesCrawled = 0;
     /** The Number of Links the crawler has found. */
@@ -33,7 +32,7 @@ public class Crawler {
     /** A Set of all URLs the crawler has already encountered. */
     private HashSet<String> knownURL = new HashSet<>();
     /** The Seed-URLs, starting point for the crawling process. */
-    private String[] seedURLs;
+    private String[] seedURLs = {};
     /** The crawled Pages, already split in title, header and content. */
     private List<Page> crawledPages = new ArrayList<>();
     /** private ArrayList<String> seedURLs = new ArrayList<>(); */
@@ -45,16 +44,18 @@ public class Crawler {
      * @param netJsonPath netJsonPath a path to a json which contains the 
      * Seed-URLs for the crawler.
      */
-    Crawler(final String netJsonPath) throws IOException {
-        this.netJsonPath = netJsonPath;
-        readNetJSON(netJsonPath);
+    Crawler(final String netJsonPath) {
+        try {
+            readNetJSON(netJsonPath);
+        } catch (IOException e) {
+            System.out.println("Reading the file " + netJsonPath + "failed.");
+            System.out.println(e.toString());
+        }
         if (seedURLs.length == 0) {
             System.out.println("No SeedURLs provided by the Json.");
         }
         //add all seedURLs to the queue
-        for (String seedURL : seedURLs) {
-            queue.add(seedURL);
-        }
+        queue.addAll(Arrays.asList(seedURLs));
     }
 
     /*
@@ -70,8 +71,10 @@ public class Crawler {
     }
 
     /**
-     * Reads the Json file, provided by the file path and reads out the Seed-URLs for the crawler and saves it in the attribute seedURLs.
-     * @param   netJsonPath a path to a json which contains the Seed-URLs for the crawler.
+     * Reads the Json file, provided by the file path and reads out the
+     * Seed-URLs for the crawler and saves it in the attribute seedURLs.
+     * @param   netJsonPath a path to a json which contains the Seed-URLs
+     * for the crawler.
      */
     private void readNetJSON(final String netJsonPath) throws IOException {
         JsonObject json = Utils.parseJSONFile(netJsonPath);
@@ -104,15 +107,11 @@ public class Crawler {
                     if (knownURL.add(curLink)) {
                      queue.add(curLink);
                     }
-                numLinks++; 
+                numLinks++;
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.out.println("Failed to fetch: " + curURL);
-            }   
-
-            //System.out.println(numPagesCrawled + "Pages crawled, Queue Size:" + queue.size());
-
+            }
         }
         //Document curSite = Jsoup.connect(null)
         return numPagesCrawled;
@@ -122,7 +121,7 @@ public class Crawler {
      * Returns the number of websites the crawler has found.
      * @return The number of websites the crawer has found.
      */
-    public int getNumPagesCrawled() {
+    protected int getNumPagesCrawled() {
         return numPagesCrawled;
     }
 
@@ -130,11 +129,11 @@ public class Crawler {
      * Returns the number of links the crawler has found.
      * @return The number of links the crawer has found.
      */
-    public int getNumLinks() {
+    protected int getNumLinks() {
         return numLinks;
     }
 
-    public List<Page> getCrawledPages() {
+    protected List<Page> getCrawledPages() {
         return crawledPages;
     }
 
