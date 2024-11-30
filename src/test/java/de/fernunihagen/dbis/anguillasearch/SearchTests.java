@@ -26,13 +26,16 @@ class SearchTests {
         List<String> foundURLs; 
 
         // Place your code here to execute the search
-        // foundURLs = search(query, seedUrls);
+        Indexer index = new Indexer(seedUrls);
+        // Our search function expects query to be a single String, with the searchterms to be seperated by " "
+        String searchQuery = String.join(" ", query);
+        foundURLs = index.search(searchQuery);
 
         // Verify that the found URLs are correct, i.e. the same as stated in the JSON file
         // Uncomment the following line once you have implemented the search
-        //assertTrue(foundURLs.containsAll(Arrays.asList(expectedURLs)));
+        assertTrue(foundURLs.containsAll(Arrays.asList(expectedURLs)));
 
         // Remove the following line after adding your code!
-        assertTrue(false);
+        //assertTrue(false);
     }
 }
