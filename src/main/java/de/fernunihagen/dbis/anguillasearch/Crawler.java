@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -85,28 +83,35 @@ public class Crawler {
      * Directly parses the files and stores the pages.
      * @return  the number of found sites.
      */
-    protected int crawl() throws IOException {
+    protected int crawl() {
         Document doc;
         String curURL;
 
         //crawl every website following links
         while (!queue.isEmpty()) {
             curURL = queue.poll();
-            doc = Jsoup.connect(curURL).get();
-            knownURL.add(curURL);
-            Page curSite = (Parser.parse(curURL, doc));
-            crawledPages.add(curSite);
-            numPagesCrawled++;
-            
-            //add all new found links into queue
-            for (String curLink : curSite.getLinks()) {
+            try {
+                doc = Jsoup.connect(curURL).get();
+                knownURL.add(curURL);
+                Page curSite = (Parser.parse(curURL, doc));
+                crawledPages.add(curSite);
+                numPagesCrawled++;
+
+                //add all new found links into queue
+                for (String curLink : curSite.getLinks()) {
                 //knownURL is a hashSet, knownURL.add(curLink) is only true, if
                 //curLink was added successfully, therefor is a new URL.
-                if (knownURL.add(curLink)) {
-                    queue.add(curLink);
+                    if (knownURL.add(curLink)) {
+                     queue.add(curLink);
+                    }
+                numLinks++; 
                 }
-                numLinks++;
             }
+            catch (IOException e) {
+                System.out.println("Failed to fetch: " + curURL);
+            }   
+
+            //System.out.println(numPagesCrawled + "Pages crawled, Queue Size:" + queue.size());
 
         }
         //Document curSite = Jsoup.connect(null)
