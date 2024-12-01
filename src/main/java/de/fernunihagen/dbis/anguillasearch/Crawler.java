@@ -38,27 +38,6 @@ public class Crawler {
     /** private ArrayList<String> seedURLs = new ArrayList<>(); */
 
     /*
-     * Initializes the Crawler, reads the provided Json and parses the 
-     * "seed-URLs" field. Uses the provided information as a starting point
-     * for the crawling process.
-     * @param netJsonPath netJsonPath a path to a json which contains the 
-     * Seed-URLs for the crawler.
-     */
-    Crawler(final String netJsonPath) {
-        try {
-            readNetJSON(netJsonPath);
-        } catch (IOException e) {
-            System.out.println("Reading the file " + netJsonPath + "failed.");
-            System.out.println(e.toString());
-        }
-        if (seedURLs.length == 0) {
-            System.out.println("No SeedURLs provided by the Json.");
-        }
-        //add all seedURLs to the queue
-        queue.addAll(Arrays.asList(seedURLs));
-    }
-
-    /*
      * Initializes the Crawler
      * @param seedURLs seedURLs should containt the absolute URLs, where the
      * crawler starts his crawling.
@@ -68,17 +47,6 @@ public class Crawler {
             queue.add(current);
             knownURL.add(current);
         }
-    }
-
-    /**
-     * Reads the Json file, provided by the file path and reads out the
-     * Seed-URLs for the crawler and saves it in the attribute seedURLs.
-     * @param   netJsonPath a path to a json which contains the Seed-URLs
-     * for the crawler.
-     */
-    private void readNetJSON(final String netJsonPath) throws IOException {
-        JsonObject json = Utils.parseJSONFile(netJsonPath);
-        seedURLs = new Gson().fromJson(json.get("Seed-URLs"), String[].class);
     }
 
     /**

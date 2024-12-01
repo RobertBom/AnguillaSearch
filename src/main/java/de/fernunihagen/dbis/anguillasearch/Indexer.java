@@ -1,6 +1,5 @@
 package de.fernunihagen.dbis.anguillasearch;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -37,19 +36,6 @@ public class Indexer {
      */
     Indexer(final String[] seedURLs) {
         crawler = new Crawler(seedURLs);
-        crawler.crawl();
-        this.pageList = crawler.getCrawledPages();
-        buildForwardIndex(pageList);
-        buildReverseIndex(pageList);
-    }
-    /**
-     * Reads the provided file and crawls all ages start from the seed URLs.
-     * Initializes the forward and backward index.
-     * @param netJsonPath a path to the JSON file which contains the "Seed-URLs"
-     * @throws IOException
-     */
-    Indexer(final String netJsonPath) throws IOException {
-        crawler = new Crawler(netJsonPath);
         crawler.crawl();
         this.pageList = crawler.getCrawledPages();
         buildForwardIndex(pageList);
@@ -195,7 +181,8 @@ public class Indexer {
         Set<Page> pageSet = new TreeSet<>();
         List<SearchResult> searchResults;
 
-        // Build a list of all Pages which contains at least one token.
+        // Build a list of all Pages which contains at least one of the search
+        // token.
         for (String searchToken : searchTokenList) {
             if (reverseIndex.get(searchToken) != null) {
                 pageSet.addAll(reverseIndex.get(searchToken).values());
@@ -217,7 +204,8 @@ public class Indexer {
             searchResults.add(new SearchResult(p.getURL(), tfidfSum));
         }
 
-        // In the tokenList.sort line no checkstyle error, here WhiteSpaceAround!?
+        // In the tokenList.sort line no checkstyle error, 
+        //here WhiteSpaceAround!?
         searchResults.sort((a, b) ->  (b.tfidf() > a.tfidf() ? -1 : 1));
         return searchResults;
     }

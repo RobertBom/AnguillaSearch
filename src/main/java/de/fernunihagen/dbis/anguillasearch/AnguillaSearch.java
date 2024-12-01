@@ -6,6 +6,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 
 /**
  * Main class of the AnguillaSearch project.
@@ -35,9 +38,11 @@ public final class AnguillaSearch {
         System.setProperty("java.awt.headless", "true");
         LOGGER.info("Java awt GraphicsEnvironment headless: {}", java.awt.GraphicsEnvironment.isHeadless());
         try {
-            String jsonPath = "intranet/cheesy1-f126d0d3.json";
-            
-            Indexer index = new Indexer(jsonPath);
+
+            JsonObject json = Utils.parseJSONFile("intranet/cheesy1-f126d0d3.json");
+            String[] seedURLs = new Gson().fromJson(json.get("Seed-URLs"), String[].class);
+
+            Indexer index = new Indexer(seedURLs);
             index.printInfo();
 
             List<SearchResult> searchResults = index.searchQuery("ricotta");
