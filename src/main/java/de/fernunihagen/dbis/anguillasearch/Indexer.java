@@ -106,7 +106,7 @@ public class Indexer {
      * @return  a list of pages, which contain the key. Null if the token is
      * not on any page
      */
-    public Map<String, Page> getReverseIndex(final String key) {
+    public Map<String, Page> getReverseIndexValues(final String key) {
         return reverseIndex.get(key);
     }
     /**
