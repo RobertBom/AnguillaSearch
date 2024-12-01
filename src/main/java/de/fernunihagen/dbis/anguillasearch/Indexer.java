@@ -91,14 +91,6 @@ public class Indexer {
         }
     }
     /**
-     * Returns the token list for the provided Page.
-     * @param key   the Page object whose tokens is to be returned
-     * @return the tokens of page, null if not in forward index
-     */
-    public List<String> getForwardIndex(final Page key) {
-        return forwardIndex.get(key);
-    }
-    /**
      * Return a map of <String url, Page p> which of pages which contain the
      * token.
      * @param key   the token of which a map of <String url, Page p> is to be 
