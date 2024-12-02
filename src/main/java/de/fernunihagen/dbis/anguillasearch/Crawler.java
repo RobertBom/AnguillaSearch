@@ -6,14 +6,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 /**
  * Crawler Class of the AnguillaSearch project.
@@ -23,8 +20,6 @@ import com.google.gson.JsonObject;
  * or by providing a String array with the Seed-URLs directly.
  */
 public class Crawler {
-    /** The Number of Pages the crawler has crawled. */
-    private int numPagesCrawled = 0;
     /** The Number of Links the crawler has found. */
     private int numLinks = 0;
     /** The queue of URLs the crawler has still process. */
@@ -43,6 +38,7 @@ public class Crawler {
      * crawler starts his crawling.
      */
     Crawler(final String[] seedURLs) {
+        this.seedURLs = seedURLs;
         for (String current : seedURLs) {
             queue.add(current);
             knownURL.add(current);
@@ -66,7 +62,6 @@ public class Crawler {
                 knownURL.add(curURL);
                 Page curSite = (Parser.parse(curURL, doc));
                 crawledPages.add(curSite);
-                numPagesCrawled++;
 
                 //add all new found links into queue
                 for (String curLink : curSite.getLinks()) {
@@ -75,14 +70,14 @@ public class Crawler {
                     if (knownURL.add(curLink)) {
                      queue.add(curLink);
                     }
-                numLinks++;
+                    numLinks++;
                 }
             } catch (IOException e) {
                 System.out.println("Failed to fetch: " + curURL);
             }
         }
         //Document curSite = Jsoup.connect(null)
-        return numPagesCrawled;
+        return crawledPages.size();
     }
 
     /**
@@ -90,7 +85,7 @@ public class Crawler {
      * @return The number of websites the crawer has found.
      */
     protected int getNumPagesCrawled() {
-        return numPagesCrawled;
+        return crawledPages.size();
     }
 
     /**
@@ -103,6 +98,10 @@ public class Crawler {
 
     protected List<Page> getCrawledPages() {
         return crawledPages;
+    }
+
+    protected String[] getSeedURLs() {
+        return seedURLs;
     }
 
 
