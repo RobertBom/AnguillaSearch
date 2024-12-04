@@ -1,12 +1,16 @@
 package de.fernunihagen.dbis.anguillasearch;
 
+import de.fernunihagen.dbis.records.TokenIDF;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+
 
 /**
  * Indexer Class of the AnguillaSearch project.
@@ -20,14 +24,20 @@ public class Indexer {
     private Crawler crawler;
     /** A list of pages which is used as data source.*/
     private List<Page> pageList;
-    /** A Map provides the needed functionality and getting the list of strings
-     *  by the key is fast.*/
-    private Map<Page, List<String>> forwardIndex = new TreeMap<>();
-    /** A Map provides the needed functionality for the reverseIndex.
-       The value a is map again, with url as the key and the corresponding Page
-       object.*/
-    private Map<String, Map<String, Page>> reverseIndex = new TreeMap<>();
-
+    /** Forward index, which stores TFIDF values for every page stored. */
+    private VecFwdIndex fwdIndex = new VecFwdIndex();
+    /** Reverse Index. */
+    private RevIndex revIndex = new RevIndex();
+    /** Not initialized, because the size is unknown at this point. 
+     * Pair of (token, IDF).
+     * Is sorted lexicographically by token attribute.
+     */
+    private TokenIDF[] tokenIDFVector;
+    /** Defines which method should be used to rank the search results.
+     * 0 = TF-IDF.
+     * 1 = Cosine similarity (default).
+     */
+    private int searchMode = 1;
 
     /**
      * Crawls all pages starting from the seed URLs.
@@ -38,8 +48,9 @@ public class Indexer {
         crawler = new Crawler(seedURLs);
         crawler.crawl();
         this.pageList = crawler.getCrawledPages();
-        buildForwardIndex(pageList);
-        buildReverseIndex(pageList);
+        buildrevIndex();
+        buildTokenVector();
+        buildForwardIndex();
     }
     /**
      * Sets the data source for the index to the provided list of pages.
@@ -48,8 +59,9 @@ public class Indexer {
      */
     Indexer(final List<Page> pageList) {
         this.pageList = pageList;
-        buildForwardIndex(pageList);
-        buildReverseIndex(pageList);
+        buildrevIndex();
+        buildTokenVector();
+        buildForwardIndex();
     }
     /**
      * Builds a forward index of all the pages in the provided list.
@@ -58,11 +70,11 @@ public class Indexer {
      * The forward index looks like this:
      * page1 : ["discover", "world", "of", "divine"]
      * page2 : ["explore", "world", "cheese", "manchego"]
-     * @param crawledPages a list of crawled pages to build the forward index
      */
-    private void buildForwardIndex(final List<Page> crawledPages) {
-        for (Page crawledPage : crawledPages) {
-            forwardIndex.put(crawledPage, crawledPage.getFilteredLemmaList());
+    private void buildForwardIndex() {
+        for (Page crawledPage : pageList) {
+            fwdIndex.put(crawledPage, crawledPage.getFilteredLemmaList(),
+            tokenIDFVector);
         }
     }
     /**
@@ -71,25 +83,36 @@ public class Indexer {
      * The reverse index looks like this:
      * "manchego" : [(url1,page1), (url5,page5), (url9,page9)]
      * "exquisite" : [(url2,page2)]
-     * @param crawledPages a list of crawled pages to build the reverse index
      */
-    private void buildReverseIndex(final List<Page> crawledPages) {
-        //run through all crawled Pages
-        for (Page crawledPage : crawledPages) {
-            //run through all token in crawledPage and add them to reverseIndex.
+    private void buildrevIndex() {
+        // run through all crawled Pages
+        for (Page crawledPage : pageList) {
+            // run through all token in crawledPage and add them to revIndex.
             for (String token : crawledPage.getFilteredLemmaList()) {
-                //the page list for current token, null if already in map
-                Map<String, Page> curPageList = reverseIndex.get(token);
+                // get the the page list for current token, null if already in
+                // map
+                Map<String, Page> curPageList = revIndex.get(token);
                 if (curPageList == null) {
+                    /* there is no entry for the current token in the reverse
+                       index. We need to create a new value.
+                    */
                     Map<String, Page> newMap = new TreeMap<>();
                     newMap.put(crawledPage.getURL(), crawledPage);
-                    reverseIndex.put(token, newMap);
+                    revIndex.put(token, newMap);
                 } else {
                     curPageList.put(crawledPage.getURL(), crawledPage);
                 }
             }
         }
     }
+    private void buildTokenVector() {
+        tokenIDFVector = new TokenIDF[revIndex.size()];
+        int i = 0;
+        for (String token : revIndex.keySet()) {
+            tokenIDFVector[i] = new TokenIDF(token, calcIDF(token));
+            i++;
+        }
+    }    
     /**
      * Return a map of <String url, Page p> which of pages which contain the
      * token.
@@ -99,15 +122,15 @@ public class Indexer {
      * not on any page
      */
     public Map<String, Page> getReverseIndexValues(final String key) {
-        return reverseIndex.get(key);
+        return revIndex.get(key);
     }
     /**
      * Print the amount of keys in the forward and revese index.
      */
     public void printInfo() {
-        System.out.println("Forward Index has " + forwardIndex.size() 
+        System.out.println("Forward Index has " + fwdIndex.size() 
         + " key-value mappings.");
-        System.out.println("Reverse Index has " + reverseIndex.size() 
+        System.out.println("Reverse Index has " + revIndex.size() 
         + " key-value mappings.");
     }
     /**
@@ -120,10 +143,10 @@ public class Indexer {
      * @return the calculated IDF value
      */
     public double calcIDF(final String t) {
-        double n = forwardIndex.size();
+        double n = pageList.size();
         //document frequency df(t)
-        if (reverseIndex.get(t) != null) {
-            double dft = reverseIndex.get(t).size();
+        if (revIndex.get(t) != null) {
+            double dft = revIndex.get(t).size();
             return Math.log(n / dft);
         } else {
             return 0.0;
@@ -138,7 +161,7 @@ public class Indexer {
      * @param p the page used for the calculation
      * @return the calculated TF.
      */
-    public double calcTF(final String t, final Page p) {
+    public static double calcTF(final String t, final Page p) {
         double count = 0;
         for (String tokenInPage : p.getFilteredLemmaList()) {
             if (t.equals(tokenInPage)) {
@@ -165,23 +188,43 @@ public class Indexer {
      * and cumulates them. Does this for every page.
      * Sorts the url of the pages by the cumulated TF-IDF value ascending.
      * @param searchString the searchterms seperated by spaces
-     * @return a list of the search results sorted by the cumulated TF-IDF
-     * value.
+     * @param explRankMode specifies which ranking method should be used. 
+     * 0 TFIDF, 1 cosine similarity.
+     * @return a list of the search results sorted by the score value.
      */
-    public List<SearchResult> searchQuery(final String searchString) {
-        List<String> searchTokenList = Parser.tokLem(searchString);
+    public List<SearchResult> searchQuery(final String searchString,
+                                         final int explRankMode) {
+        // TreeSet eliminates duplicates and sorts our Token
+        TreeSet<String> searchTokenList = new TreeSet<>(
+                                                Parser.tokLem(searchString));
         Set<Page> pageSet = new TreeSet<>();
-        List<SearchResult> searchResults;
 
         // Build a list of all Pages which contains at least one of the search
         // token.
         for (String searchToken : searchTokenList) {
-            if (reverseIndex.get(searchToken) != null) {
-                pageSet.addAll(reverseIndex.get(searchToken).values());
+            if (revIndex.get(searchToken) != null) {
+                pageSet.addAll(revIndex.get(searchToken).values());
             }
         }
-        searchResults = new ArrayList<>(pageSet.size());
-
+        switch (explRankMode) {
+            case 0:
+                return rankTFIDF(pageSet, searchTokenList);
+            case 1:
+                return rankCosineSimilarity(pageSet, searchTokenList);
+            default:
+                return rankTFIDF(pageSet, searchTokenList);
+        }
+    }
+    /**
+     * @param searchString
+     * @return list of the search results sorted by the score value.
+     */
+    public List<SearchResult> searchQuery(final String searchString) {
+        return searchQuery(searchString, this.searchMode);
+    }
+    private List<SearchResult> rankTFIDF(final Set<Page> pageSet, 
+                                        final Set<String> searchTokenList) {
+        List<SearchResult> searchResults = new ArrayList<>(pageSet.size());
         // Iterate over all Pages, which have searchresults and calulate TF-IDF
         // sum.
         Iterator<Page> iter = pageSet.iterator();
@@ -198,7 +241,51 @@ public class Indexer {
 
         // In the tokenList.sort line no checkstyle error, 
         //here WhiteSpaceAround!?
-        searchResults.sort((a, b) ->  (b.tfidf() > a.tfidf() ? -1 : 1));
+        searchResults.sort((a, b) ->  (b.score() > a.score() ? -1 : 1));
+        return searchResults;
+    }
+    private List<SearchResult> rankCosineSimilarity(final Set<Page> pageSet, 
+                                    final TreeSet<String> searchTokenList) {
+        List<SearchResult> searchResults = new ArrayList<>(pageSet.size());
+        int vecL = tokenIDFVector.length;
+
+        // build search vector 
+        double[] searchV = new double[vecL];
+        Arrays.fill(searchV, 0.0);
+        /* We can use the fact that both searchTokenList and tokenIDFVector are
+        *  lexicographically sorted. i is used as an index for tokenIDFVector.
+        *  Could optimize further using binary search but not a priority right
+        *  now.
+        */
+        int i = 0;
+        Iterator<String> stIter = searchTokenList.iterator();
+        while (stIter.hasNext() && i < vecL) {
+            String curSearchToken = stIter.next();
+            // while our current search token is lexicographically greater, we 
+            // move forward in the tokenIDFVector
+            while (curSearchToken.compareTo(tokenIDFVector[i].token()) > 0 &&
+                                                                    i < vecL) {
+                i++;
+            }
+            if (curSearchToken.compareTo(tokenIDFVector[i].token()) == 0) {
+                searchV[i] = 1;
+            }
+        }
+        
+        // iterate through pages and rank then using cosine similarity.
+        Iterator<Page> pIter = pageSet.iterator();
+        while (pIter.hasNext()) {
+            Page curPage = pIter.next();
+            double curScore = -1; // debug value
+
+            curScore = cosineSimilarity(searchV, 
+                                        fwdIndex.getTFIDFVector(curPage));
+            searchResults.add(new SearchResult(curPage.getURL(), curScore));
+        }
+        // sort the search results by score ascending.
+        searchResults.sort((a, b) ->  (b.score() > a.score() ? -1 : 1));
+
+
         return searchResults;
     }
     /**
@@ -225,12 +312,12 @@ public class Indexer {
      * Useful to build a stopword list.
      */
     public void printMostCommonTokens() {
-        /** Represents the amount of tokens the reverse index contains */
-        int size = reverseIndex.size();
-        /** How many results we want to print  */
+        // Represents the amount of tokens the reverse index contains */
+        int size = revIndex.size();
+        // How many results we want to print  */
         final int resToPrint = 25;
         List<TokenCount> tokenList = new ArrayList<>(size);
-        for (String key : reverseIndex.keySet()) {
+        for (String key : revIndex.keySet()) {
             tokenList.add(new TokenCount(key));
         }
         // In Line 221
@@ -251,8 +338,55 @@ public class Indexer {
 
         TokenCount(final String token) {
             this.token = token;
-            count = reverseIndex.get(token).size();
+            count = revIndex.get(token).size();
         }
+    }
+    /**
+     * Calculates the dot product of two vectors. Throws 
+     * IllegalArgumentException if the dimensions do not match.
+     * dot product is defined as: \sum_{i=1}^n a_i \cdot a_b.
+     * n is the dimension of vector a and b.
+     * @param a vector a
+     * @param b vector b
+     * @return Dot product of a and b.
+     */
+    static double dotProduct(final double[] a, final double[] b) {
+        if (a.length != b.length) {
+            throw new IllegalArgumentException("Vector dimension not the same");
+        } else {
+            double result = 0;
+            for (int i = 0; i < a.length; i++) {
+                result += a[i] * b[i];
+            }
+            return result;
+        }
+    }
+    /**
+     * Calculates the euclidian norm of the vector in the argument.
+     * The euclidian norm is defined as:
+     * \sqrt{\sum_{i=1}^n a_i^2}.
+     * @param a vector of which the euclidian norm should be calculated
+     * @return the euclidian norm of the vector.
+     */
+    static double calcEuclidianNorm(final double[] a) {
+        double quadSum = 0;
+        // sum_{i=1}^n a_i^2
+        for (int i = 0;  i < a.length; i++) {
+            quadSum += a[i] * a[i];
+        }
+        return Math.sqrt(quadSum);
+    }
+    /**
+     * Calculates the cosine similarity between two vectors.
+     * The cosine similarity is defined as:
+     * \frac{a \cdot b} {||a|| \cdot ||b||}.
+     * @param a vector a
+     * @param b vector b
+     * @return cosine similarity of a and b.
+     */
+    static double cosineSimilarity(final double[] a, final double[] b) {
+        return dotProduct(a, b) / 
+        (calcEuclidianNorm(a) * calcEuclidianNorm(b));
     }
 
 }

@@ -95,15 +95,10 @@ public class Crawler {
     protected int getNumLinks() {
         return numLinks;
     }
-
     protected List<Page> getCrawledPages() {
         return crawledPages;
     }
-
     protected String[] getSeedURLs() {
         return seedURLs;
     }
-
-
-
 }

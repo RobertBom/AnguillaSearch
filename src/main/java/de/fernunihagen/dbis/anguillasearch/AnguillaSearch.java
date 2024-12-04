@@ -39,15 +39,20 @@ public final class AnguillaSearch {
         LOGGER.info("Java awt GraphicsEnvironment headless: {}", java.awt.GraphicsEnvironment.isHeadless());
         try {
 
-            JsonObject json = Utils.parseJSONFile("intranet/cheesy1-f126d0d3.json");
+            JsonObject json = Utils.parseJSONFile("intranet/cheesy3-7fdaa098.json");
             String[] seedURLs = new Gson().fromJson(json.get("Seed-URLs"), String[].class);
 
             Indexer index = new Indexer(seedURLs);
             index.printInfo();
-
-            List<SearchResult> searchResults = index.searchQuery("ricotta");
+            
+            List<SearchResult> searchResults = index.searchQuery("burrata slovakianbryndza cantal", 0);
             for (SearchResult searchResult : searchResults) {
-                System.out.format("URL: %-30s\tTF-IDF: %f%n", searchResult.url(), searchResult.tfidf());
+                System.out.format("URL: %-40s\tTFIDF Sum: %f%n", searchResult.url(), searchResult.score());
+            }
+
+            searchResults = index.searchQuery("burrata slovakianbryndza cantal", 1);
+            for (SearchResult searchResult : searchResults) {
+                System.out.format("URL: %-40s\tCosine Similarity: %f%n", searchResult.url(), searchResult.score());
             }
         } catch (IOException e) {
             System.out.println(e.toString());

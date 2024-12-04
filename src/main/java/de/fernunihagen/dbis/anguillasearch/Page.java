@@ -48,13 +48,13 @@ public class Page implements Comparable<Page> {
         return url;
     }
 
-    /**
-     * Simple compareTo function which uses the url attribute and
+    /** Simple compareTo function which uses the url attribute and
      * String.compareTo()
      * @param p other Page to compare to.
      * @return 0 if the the url attributes of both Pages are the same .
      * < 0 if the url is lexicographically less than the url of p. else > 0 
      */
+    @Override
     public int compareTo(final Page p) {
         return this.url.compareTo(p.getURL());
     }

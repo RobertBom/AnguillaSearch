@@ -18,8 +18,9 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 /**
  * Parser Class which provides several functions.
  */
-public class Parser {
-    /** variable to save the Regex for Stopword Removal, so we don't have to build it only once */
+abstract public class Parser {
+    /** variable to save the Regex for Stopword Removal, so we
+     *  have to build it only once */
     private static String stopWordRegex = null;
 
      /**
@@ -48,15 +49,18 @@ public class Parser {
     }
 
     /**
-     * 
-     * 
+     * Removes stopwords of the supplied string. Reads stopwords.txt and
+     * expects stopwords to be seperated by \n
+     * @param inputString the string of which the stopwords should be removed from
+     * @return the inputString, but without stopwords.
     */
     public static String rmStopWords(final String inputString) {
         /** the String we work on */
         String workString = inputString;
         if (stopWordRegex == null) {
-            try{
-                List<String> stopWords = Files.readAllLines(Paths.get("stopwords.txt"));
+            try {
+                List<String> stopWords = Files.readAllLines(Paths
+                                                        .get("stopwords.txt"));
                 //create Regex
                 StringBuilder strB = new StringBuilder();
                 strB.append("\\b(");
@@ -64,11 +68,10 @@ public class Parser {
                     strB.append(stopword + "|");
                 }
                 //remove replace last | by )
-                strB.setCharAt(strB.length()-1, ')');
+                strB.setCharAt(strB.length() -1, ')');
                 strB.append("\\b");
                 stopWordRegex = strB.toString();
-            }
-            catch(IOException e) {
+            } catch(IOException e) {
                 System.out.println("Failed to load Stopwordlist.");
                 System.out.println(e.toString());
             }
@@ -80,19 +83,24 @@ public class Parser {
     /**
      * Tokenizes and lemmatizes the input String.
      * e.g. 
-     * "Welcome to our exquisite selection of artisanal cheeses! Explore the rich flavors and unique textures" will be converted into
-     * ["welcome", "to", "we", "exquisite", "selection", "of", "artisanal", "cheese", "explore", "the", "rich", "flavor", "and", "unique", "texture"]
-     * @param content   The String which should be tokenized
+     * "Welcome to our exquisite selection of artisanal cheeses! Explore the
+     * rich flavors and unique textures" will be converted into
+     * ["welcome", "to", "we", "exquisite", "selection", "of",
+     * "artisanal", "cheese", "explore", "the", "rich", "flavor", "and",
+     * "unique", "texture"]
+     * @param inputString   The String which should be tokenized
      * @return  an ArrayList<String> of the token of content.
      */
-    public static ArrayList<String> tokLem(final String inputString) {
+    public static List<String> tokLem(final String inputString) {
         ArrayList<String> outputList = new ArrayList<>();
         
-        /** the String which we manipulate to get the tokenized and lemmatized result */
+        /** the String which we manipulate to get the tokenized and
+         * lemmatized result */
         String workString = inputString;
 
-        //remove \, |, and punctiation marks.
-        workString = workString.replaceAll("[\\\\|.!,:-]", "");
+        // remove \, |, and punctiation marks.
+        // – U+2013 : EN DASH not removed
+        workString = workString.replaceAll("[\\\\|.!,:\\-?\\&]", "");
         workString = workString.toLowerCase();
 
         //remove StopWords
@@ -109,7 +117,7 @@ public class Parser {
 
         //create list of lemmas.
         List<CoreLabel> tokenList = coreDoc.tokens();
-        for(CoreLabel token : tokenList) {
+        for (CoreLabel token : tokenList) {
             outputList.add(token.lemma());
         }
 

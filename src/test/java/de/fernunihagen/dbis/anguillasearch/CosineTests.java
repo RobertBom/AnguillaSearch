@@ -20,10 +20,7 @@ class CosineTests {
 
         // The cosine similarity of two equal vectors should be 1.0
         // Replace the cosineSimilarity method with your implementation
-        //assertEquals(1.0, cosineSimilarity(vectorA, vectorB));
-
-        // and remove the following line
-        assertTrue(false);
+        assertEquals(1.0, Indexer.cosineSimilarity(vectorA, vectorB));
     }
 
     @Test
@@ -33,10 +30,7 @@ class CosineTests {
         double[] vectorB = { 0.0, 1.0, 0.0 };
         // The cosine similarity of two orthogonal vectors should be 0.0
         // Replace the cosineSimilarity method with your implementation
-        //assertEquals(0.0, cosineSimilarity(vectorA, vectorB));
-
-        // and remove the following line!
-        assertTrue(false);
+        assertEquals(0.0, Indexer.cosineSimilarity(vectorA, vectorB));
     }
 
     @Test
@@ -46,11 +40,8 @@ class CosineTests {
         double[] vectorB = { 0.5, 0.4, 0.3, 0.2, 0.1 };
         // The cosine similarity of two random positive vectors should be between 0.0 and 1.0
         // Replace the cosineSimilarity method with your implementation
-        //assertTrue(cosineSimilarity(vectorA, vectorB) > 0.0);
-        //assertTrue(cosineSimilarity(vectorA, vectorB) < 1.0);
-
-        // and remove the following line!
-        assertTrue(false);
+        assertTrue(Indexer.cosineSimilarity(vectorA, vectorB) > 0.0);
+        assertTrue(Indexer.cosineSimilarity(vectorA, vectorB) < 1.0);
     }
 
     @Test
@@ -60,9 +51,6 @@ class CosineTests {
         double[] vectorB = { 0.5, 0.4, 0.3, 0.2, 0.1 };
         // The cosine similarity of these vectors should be 0.7
         // Replace the cosineSimilarity method with your implementation
-        //assertTrue(Math.abs(cosineSimilarity(vectorA, vectorB) - 0.6364) < 0.0001);
-
-        // and remove the following line!
-        assertTrue(false);
+        assertTrue(Math.abs(Indexer.cosineSimilarity(vectorA, vectorB) - 0.6364) < 0.0001);
     }
 }
