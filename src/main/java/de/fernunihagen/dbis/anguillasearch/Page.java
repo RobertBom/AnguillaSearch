@@ -1,7 +1,9 @@
 package de.fernunihagen.dbis.anguillasearch;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class Page implements Comparable<Page> {
     /** The URL of the Page saved. */
@@ -12,19 +14,20 @@ public class Page implements Comparable<Page> {
     private String header;
     /** The content of the page saved. */
     private String content;
-    /** A List of all outgoing Links of the page saved. */
-    private List<String> linkList = new ArrayList<>();
+    /** A Set of all outgoing Links of the page saved. 
+     * A Set because we do not want duplicates */
+    private Set<String> linkSet = new HashSet<>();
     /** A List of all lemmas the page contains. */
-    private List<String> filteredLemmaList = new ArrayList<>();
+    private List<String> filteredLemmaList = new LinkedList<>();
 
 
     Page(final String url, final String title, final String header, 
-         final String content, final ArrayList<String> linkList) {
+         final String content, final Set<String> linkList) {
         this.url = url;
         this.title = title;
         this.header = header;
         this.content = content;
-        this.linkList = linkList;
+        this.linkSet = linkList;
 
         //tanks performance
         filteredLemmaList.addAll(Parser.tokLem(title));
@@ -36,8 +39,8 @@ public class Page implements Comparable<Page> {
      * Returns a list of links found on the Website.
      * @return  List of links found on the Website.
      */
-    protected List<String> getLinks() {
-        return linkList;
+    public Set<String> getLinks() {
+        return linkSet;
     }
 
     /**

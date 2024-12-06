@@ -1,7 +1,6 @@
 package de.fernunihagen.dbis.anguillasearch;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,21 +38,13 @@ public final class AnguillaSearch {
         LOGGER.info("Java awt GraphicsEnvironment headless: {}", java.awt.GraphicsEnvironment.isHeadless());
         try {
 
-            JsonObject json = Utils.parseJSONFile("intranet/cheesy3-7fdaa098.json");
+            JsonObject json = Utils.parseJSONFile("intranet/cheesy6-54ae2b2e.json");
             String[] seedURLs = new Gson().fromJson(json.get("Seed-URLs"), String[].class);
 
             Indexer index = new Indexer(seedURLs);
             index.printInfo();
-            
-            List<SearchResult> searchResults = index.searchQuery("burrata slovakianbryndza cantal", 0);
-            for (SearchResult searchResult : searchResults) {
-                System.out.format("URL: %-40s\tTFIDF Sum: %f%n", searchResult.url(), searchResult.score());
-            }
 
-            searchResults = index.searchQuery("burrata slovakianbryndza cantal", 1);
-            for (SearchResult searchResult : searchResults) {
-                System.out.format("URL: %-40s\tCosine Similarity: %f%n", searchResult.url(), searchResult.score());
-            }
+            index.testPageRank();
         } catch (IOException e) {
             System.out.println(e.toString());
         }

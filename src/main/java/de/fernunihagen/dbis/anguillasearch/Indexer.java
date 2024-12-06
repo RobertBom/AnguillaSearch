@@ -63,6 +63,9 @@ public class Indexer {
         buildTokenVector();
         buildForwardIndex();
     }
+    public void testPageRank() {
+        PageRank pageRank = new PageRank(pageList);
+    }
     /**
      * Builds a forward index of all the pages in the provided list.
      * The values are a tokenized, stopword-removed, lemmatized list of all

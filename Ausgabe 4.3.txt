@@ -1,0 +1,129 @@
+2024-12-06 18:26:26 INFO  AnguillaSearch - Starting AnguillaSearch...
+2024-12-06 18:26:27 INFO  Crawler - Crawling and lemmatizing took: 963 ms
+Forward Index has 4 key-value mappings.
+Reverse Index has 139 key-value mappings.
+Iteration: 0-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.500000
+URL: http://cheddar24.cheesy6                           old PR: 0.250000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.250000
+Iteration: 1-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.500000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.500000
+Iteration: 2-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.500000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.500000 new PR: 0.250000
+Iteration: 3-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.500000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.500000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.250000
+Iteration: 4-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.500000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.500000
+Iteration: 5-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.500000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.500000 new PR: 0.250000
+Iteration: 6-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.500000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.500000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.250000
+Iteration: 7-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.500000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.500000
+Iteration: 8-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.500000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.500000 new PR: 0.250000
+Iteration: 9-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.500000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.500000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.250000
+Iteration: 10-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.500000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.500000
+Iteration: 11-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.500000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.500000 new PR: 0.250000
+Iteration: 12-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.500000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.500000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.250000
+Iteration: 13-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.500000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.500000
+Iteration: 14-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.500000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.500000 new PR: 0.250000
+Iteration: 15-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.500000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.500000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.250000
+Iteration: 16-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.500000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.500000
+Iteration: 17-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.500000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.500000 new PR: 0.250000
+Iteration: 18-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.500000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.500000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.250000
+Iteration: 19-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.500000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.500000
+Iteration: 20-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.500000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.500000 new PR: 0.250000
+Iteration: 21-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.500000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.500000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.250000
+Iteration: 22-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.500000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.500000
+Iteration: 23-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.250000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.250000 new PR: 0.500000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.500000 new PR: 0.250000
+Iteration: 24-----------------------------
+URL: http://brie24.cheesy6                              old PR: 0.250000 new PR: 0.500000
+URL: http://cheddar24.cheesy6                           old PR: 0.000000 new PR: 0.000000
+URL: http://crumbly-cheddar.cheesy6                     old PR: 0.500000 new PR: 0.250000
+URL: http://nutty-cheddar24.cheesy6                     old PR: 0.250000 new PR: 0.250000

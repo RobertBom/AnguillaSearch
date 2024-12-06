@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,10 +20,11 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 /**
  * Parser Class which provides several functions.
  */
-abstract public class Parser {
+public abstract class Parser {
     /** variable to save the Regex for Stopword Removal, so we
      *  have to build it only once */
     private static String stopWordRegex = null;
+    private static StanfordCoreNLP pipeline = null;
 
      /**
      * Parses the already fetched page and create a Page-Object, which contains
@@ -36,16 +39,16 @@ abstract public class Parser {
         String header = page.getElementsByTag("header").text(); 
 
         Elements links = page.getElementsByTag("a");
-        ArrayList<String> linkList = new ArrayList<>();
+        Set<String> linkSet = new HashSet<>();
         for (Element curLink : links) {
-            linkList.add(curLink.attr("href"));
+            linkSet.add(curLink.attr("href"));
         }
 
         Elements docContent = page.getElementsByTag("main");
         docContent.select("a").remove();
         String content = docContent.text();
 
-        return new Page(url, title, header, content, linkList);
+        return new Page(url, title, header, content, linkSet);
     }
 
     /**
@@ -107,9 +110,11 @@ abstract public class Parser {
         workString = rmStopWords(workString);
 
         //create out StanfordCoreNLP Pipeline with the right annotators
-        Properties props = new Properties();
-        props.setProperty("annotators", "tokenize,ssplit,pos,lemma");
-        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+        if (pipeline == null) {
+            Properties props = new Properties();
+            props.setProperty("annotators", "tokenize,ssplit,pos,lemma");
+            pipeline = new StanfordCoreNLP(props);
+        }
 
         //process our workstring
         CoreDocument coreDoc = new CoreDocument(workString);

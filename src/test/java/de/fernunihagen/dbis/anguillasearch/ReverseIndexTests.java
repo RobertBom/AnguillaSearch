@@ -5,10 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -42,7 +45,7 @@ class ReverseIndexTests {
             String title = testPage.get("title").getAsString();
             String header = testPage.get("headings").getAsString();
             String content = testPage.get("paragraphs").getAsString();
-            Page p = new Page(url, title, header, content, new ArrayList<String>());
+            Page p = new Page(url, title, header, content, new HashSet<String>());
             pageList.add(p);
         }
         index = new Indexer(pageList);

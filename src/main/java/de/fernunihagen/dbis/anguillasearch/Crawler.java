@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +22,7 @@ import java.util.Queue;
  * or by providing a String array with the Seed-URLs directly.
  */
 public class Crawler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
     /** The Number of Links the crawler has found. */
     private int numLinks = 0;
     /** The queue of URLs the crawler has still process. */
@@ -31,7 +34,6 @@ public class Crawler {
     /** The crawled Pages, already split in title, header and content. */
     private List<Page> crawledPages = new ArrayList<>();
     /** private ArrayList<String> seedURLs = new ArrayList<>(); */
-
     /*
      * Initializes the Crawler
      * @param seedURLs seedURLs should containt the absolute URLs, where the
@@ -51,6 +53,7 @@ public class Crawler {
      * @return  the number of found sites.
      */
     protected int crawl() {
+        long startTimestamp = System.currentTimeMillis();
         Document doc;
         String curURL;
 
@@ -73,10 +76,16 @@ public class Crawler {
                     numLinks++;
                 }
             } catch (IOException e) {
-                System.out.println("Failed to fetch: " + curURL);
+                LOGGER.warn("Failed to fetch: {}", curURL);
+            }
+            if (crawledPages.size() % 100 == 0) {
+                LOGGER.info("Crawled {} pages.", crawledPages.size());
             }
         }
         //Document curSite = Jsoup.connect(null)
+        long stopTimeStamp = System.currentTimeMillis();
+        long crawlTime = stopTimeStamp - startTimestamp;
+        LOGGER.info("Crawling and lemmatizing took: {} ms", crawlTime);
         return crawledPages.size();
     }
 
