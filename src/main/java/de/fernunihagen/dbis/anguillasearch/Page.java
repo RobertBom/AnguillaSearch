@@ -22,18 +22,36 @@ public class Page implements Comparable<Page> {
 
 
     Page(final String url, final String title, final String header, 
-         final String content, final Set<String> linkList) {
+         final String content, final Set<String> linkSet) {
         this.url = url;
         this.title = title;
         this.header = header;
         this.content = content;
-        this.linkSet = linkList;
+        this.linkSet = linkSet;
 
         //tanks performance
         filteredLemmaList.addAll(Parser.tokLem(title));
         filteredLemmaList.addAll(Parser.tokLem(header));
         filteredLemmaList.addAll(Parser.tokLem(content));
     }
+    // Constructor without lemmatizing, a lot faster, useful for running tests
+    // that do not need lemmatization.
+    Page(final String url, final String title, final String header, 
+        final String content, final Set<String> linkSet, boolean noLemma) {
+            this.url = url;
+            this.title = title;
+            this.header = header;
+            this.content = content;
+            this.linkSet = linkSet;
+            
+            if (!noLemma) {
+                filteredLemmaList.addAll(Parser.tokLem(title));
+                filteredLemmaList.addAll(Parser.tokLem(header));
+                filteredLemmaList.addAll(Parser.tokLem(content));
+            }
+    }
+
+    
 
     /**
      * Returns a list of links found on the Website.

@@ -1,6 +1,9 @@
 package de.fernunihagen.dbis.anguillasearch;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +41,28 @@ public final class AnguillaSearch {
         LOGGER.info("Java awt GraphicsEnvironment headless: {}", java.awt.GraphicsEnvironment.isHeadless());
         try {
 
-            JsonObject json = Utils.parseJSONFile("intranet/cheesy6-54ae2b2e.json");
+            JsonObject json = Utils.parseJSONFile("intranet/cheesy3-7fdaa098.json");
             String[] seedURLs = new Gson().fromJson(json.get("Seed-URLs"), String[].class);
 
             Indexer index = new Indexer(seedURLs);
             index.printInfo();
 
-            index.testPageRank();
+            String searchString = "burrata slovakianbryndza cantal";
+            System.out.println("TF-IDF:");
+            List<SearchResult> sr = index.searchQuery(searchString,0);
+            index.printSearchResults(sr);
+            System.out.println("Cosine Similarity:");
+            sr = index.searchQuery(searchString, 1);
+            index.printSearchResults(sr);
+            System.out.println("Pagerank Cosine Combination:");
+            sr = index.searchQuery(searchString, 2);
+            index.printSearchResults(sr);
         } catch (IOException e) {
             System.out.println(e.toString());
         }
+    }
+    public Map<String, List<String>> argsParser(final String[] args) {
+        Map<String, List<String>> argMap = new HashMap<>();
+        return argMap;
     }
 }

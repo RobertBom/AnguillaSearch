@@ -6,9 +6,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -20,6 +24,7 @@ import java.util.TreeSet;
  * 
  */
 public class Indexer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Indexer.class);
     /** The Crawler provides us with a list of fetched pages.*/
     private Crawler crawler;
     /** A list of pages which is used as data source.*/
@@ -36,8 +41,9 @@ public class Indexer {
     /** Defines which method should be used to rank the search results.
      * 0 = TF-IDF.
      * 1 = Cosine similarity (default).
+     * 2 = Combination of PageRank and Cosine similarity.
      */
-    private int searchMode = 1;
+    private int defRankMode = 2;
 
     /**
      * Crawls all pages starting from the seed URLs.
@@ -64,7 +70,7 @@ public class Indexer {
         buildForwardIndex();
     }
     public void testPageRank() {
-        PageRank pageRank = new PageRank(pageList);
+        new PageRank(pageList);
     }
     /**
      * Builds a forward index of all the pages in the provided list.
@@ -131,10 +137,8 @@ public class Indexer {
      * Print the amount of keys in the forward and revese index.
      */
     public void printInfo() {
-        System.out.println("Forward Index has " + fwdIndex.size() 
-        + " key-value mappings.");
-        System.out.println("Reverse Index has " + revIndex.size() 
-        + " key-value mappings.");
+        LOGGER.info("Forward Index has {} key-value mappings.", fwdIndex.size());
+        LOGGER.info("Reverse Index has {} key-value mappings.", revIndex.size());
     }
     /**
      * Calculates the IDF (Inverted Document Frequency) for a provided token.
@@ -214,6 +218,8 @@ public class Indexer {
                 return rankTFIDF(pageSet, searchTokenList);
             case 1:
                 return rankCosineSimilarity(pageSet, searchTokenList);
+            case 2:
+                return rankPageCosine(pageSet, searchTokenList);
             default:
                 return rankTFIDF(pageSet, searchTokenList);
         }
@@ -223,7 +229,7 @@ public class Indexer {
      * @return list of the search results sorted by the score value.
      */
     public List<SearchResult> searchQuery(final String searchString) {
-        return searchQuery(searchString, this.searchMode);
+        return searchQuery(searchString, this.defRankMode);
     }
     private List<SearchResult> rankTFIDF(final Set<Page> pageSet, 
                                         final Set<String> searchTokenList) {
@@ -244,7 +250,7 @@ public class Indexer {
 
         // In the tokenList.sort line no checkstyle error, 
         //here WhiteSpaceAround!?
-        searchResults.sort((a, b) ->  (b.score() > a.score() ? -1 : 1));
+        searchResults.sort((a, b) ->  (b.score() < a.score() ? -1 : 1));
         return searchResults;
     }
     private List<SearchResult> rankCosineSimilarity(final Set<Page> pageSet, 
@@ -285,11 +291,71 @@ public class Indexer {
                                         fwdIndex.getTFIDFVector(curPage));
             searchResults.add(new SearchResult(curPage.getURL(), curScore));
         }
-        // sort the search results by score ascending.
-        searchResults.sort((a, b) ->  (b.score() > a.score() ? -1 : 1));
+        // sort the search results by score descending.
+        searchResults.sort((a, b) ->  (b.score() < a.score() ? -1 : 1));
 
 
         return searchResults;
+    }
+    public List<SearchResult> rankPageCosine(final Set<Page> filteredPageSet,
+                                final TreeSet<String> searchTokenList) {
+        List<SearchResult> searchResults = new ArrayList<>(filteredPageSet.size());
+        /** How much the normalized cosine scores weigh in contrast to 
+         * the corresponding pagerank score */
+        final double cosWeight = 0.75;
+
+        // getting data
+        List<SearchResult> cosineResults = rankCosineSimilarity(filteredPageSet, searchTokenList);
+        PageRank pageRank = new PageRank(pageList);
+        // pageRankMap contains the pagerank for ALL pages crawled
+        Map<String, Double> allPageRankMap = pageRank.getPageRankMap();
+        Map<String, Double> pageRankMap = new TreeMap<>();
+        // add ONLY pages to pageRankMap, which show up in our searchresults
+        cosineResults.forEach(sr -> pageRankMap.put(sr.url(),
+                            allPageRankMap.get(sr.url())));
+
+        /* Since the average Pagerank score in our implementation is highly
+        *  dependant on the total amount of pages crawled (it should be around
+        *  1/N, N = pages crawled), we calculate the average for both the 
+        *  cosine and pageRank average and later use a percentage of the avg
+        *  as a score.
+        */
+        OptionalDouble avgCosineScore = cosineResults.stream()
+                    .map(p -> p.score()) //get Stream<double> of scores
+                    .mapToDouble(Double::doubleValue) // convert to DoubleStream
+                    .average(); // calculate average
+        if (!avgCosineScore.isPresent()) {
+            throw new IllegalArgumentException(
+                "cosineResults has uninitialized score values.");
+        }
+        OptionalDouble avgPageRankScore = pageRankMap.values()
+                    .stream()
+                    .mapToDouble(Double::doubleValue)
+                    .average();
+        if (!avgPageRankScore.isPresent()) {
+            throw new IllegalArgumentException(
+                "PageRankMap has uninitialized score values.");
+        }
+
+        //LOGGER.debug("Avg Cosine Score is: {} \tAvg Pagerank Score: {}", avgCosineScore, avgPageRankScore);
+        for (SearchResult cosRes : cosineResults) {
+            double cosineScore = cosRes.score();
+            double pageRankScore = pageRankMap.get(cosRes.url());
+            // absolute valules
+            // System.out.format("URL: %-40s\tCos Score: %f\tPagerank: %f%n", cosRes.url(), cosineScore, pageRankScore);
+            // convert scores to percent scores of average
+            cosineScore =  cosineScore / avgCosineScore.getAsDouble();
+            pageRankScore = pageRankScore / avgPageRankScore.getAsDouble();
+
+            // relative values
+            System.out.format("URL: %-40s\tCos Score: %-3.0f%%\tPagerank: %-3.0f%%%n", cosRes.url(), cosineScore*100, pageRankScore*100);
+            double newScore =   cosWeight * cosineScore +
+                                (1- cosWeight) * pageRankScore;
+            searchResults.add(new SearchResult(cosRes.url(), newScore));
+        }
+        // Sort the resuls by score.
+        searchResults.sort( (a,b) -> (b.score() < a.score() ? -1 : 1));
+        return searchResults;        
     }
     /**
      * Executes a search for provided query.
@@ -300,7 +366,19 @@ public class Indexer {
      * sorted by the cumulated TF-IDF value.
      */
     public List<String> search(final String searchString) {
-        List<SearchResult> searchResults = searchQuery(searchString);
+        // uses default defRankMode specified in defRankMode attribute.
+        return search(searchString, this.defRankMode);
+    }
+    /**
+     * Executes a search for provided query.
+     * Uses searchQuery() and just returns the of sorted URLs without the
+     * TF-IDF values.
+     * @param searchString the searchterms seperated by spaces
+     * @return a sorted list of urls containing at least on the searchterms,
+     * sorted by the cumulated TF-IDF value.
+     */
+    public List<String> search(final String searchString, final int explRankMode) {
+        List<SearchResult> searchResults = searchQuery(searchString, explRankMode);
         List<String> urlList = new ArrayList<>(searchResults.size());
 
         // extract the URL list of the SearchResult list.
@@ -309,7 +387,6 @@ public class Indexer {
         }
         return urlList;
     }
-
     /**
      * Analyzes the reverse index to build a list of the most common tokens.
      * Useful to build a stopword list.
@@ -328,6 +405,11 @@ public class Indexer {
         for (int i = 0; i < resToPrint && i < tokenList.size(); i++) {
             System.out.format("Token: %-20s Count: %d%n", 
             tokenList.get(i).token, tokenList.get(i).count);
+        }
+    }
+    public void printSearchResults(List<SearchResult> searchResults) {
+        for (SearchResult sr : searchResults) {
+            System.out.format("URL: %-35s\tScore: %f%n", sr.url(), sr.score());
         }
     }
     /**

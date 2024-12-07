@@ -3,6 +3,7 @@ package de.fernunihagen.dbis.anguillasearch;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -14,10 +15,11 @@ public class PageRank {
      */
     private Map<String, linkMapElem> linkMap = new TreeMap<>();
     private Map<String, Double> pageRankMap = new TreeMap<>();
+    private double dampingFactor = 0.85;
     
     
 
-    PageRank(final List<Page> pageList) {
+    PageRank(final Collection<Page> pageList) {
         buildInbLinkList(pageList);
         rankPages();
     }
@@ -26,7 +28,7 @@ public class PageRank {
      * @param pageList the list of pages of which the map for inbound links
      * should be created.
      */
-    private void buildInbLinkList(final List<Page> pageList) {
+    private void buildInbLinkList(final Collection<Page> pageList) {
         // create a map entry with empty set for every page
         // and the outgoing link count
         for(Page curPage : pageList){
@@ -55,7 +57,7 @@ public class PageRank {
      */
     private void rankPages() {
         // initialize all pages with the pagerank of 1/N, where N is the number
-        // of total sites
+        // of total sites. Also functions as our ranksource value.
         double n = 1.0 / linkMap.size();
         for (String key : linkMap.keySet()) {
             pageRankMap.put(key, n);
@@ -66,7 +68,6 @@ public class PageRank {
         double delta = 0;
         // Calculate new PageRanks till the cumulated absolute delta is smaller epsilon
         do {
-            System.out.println("Iteration: " + iterationCount + "-----------------------------");
             Map<String, Double> newPageRankMap = new TreeMap<>();
             delta = 0;
             // iterate through all pages.
@@ -81,25 +82,23 @@ public class PageRank {
                 for(String linksToCurPage : linksToCurPageSet) {
                     double prj = pageRankMap.get(linksToCurPage);
                     int cj = linkMap.get(linksToCurPage).outBoundLinks();
-                    newPageR += prj / cj;
+                    newPageR += dampingFactor * (prj / cj);
                 }
+                // add Ranksource
+                newPageR += (1 - dampingFactor) * n;
                 delta += Math.abs(oldPageR - newPageR);
                 // save new PageRank to out new map
                 newPageRankMap.put(curPage, newPageR);
-                System.out.format("URL: %-50s old PR: %5f new PR: %5f%n", curPage, oldPageR, newPageR);
+                //System.out.format("URL: %-50s old PR: %5f new PR: %5f%n", curPage, oldPageR, newPageR);
                 
             }
             // switch old pageRanks with new pageRanks
             pageRankMap = newPageRankMap;
             iterationCount++;
-
-            if (iterationCount % 500 == 0) {
-                System.out.format("Iteration Count: %5d\tDelta: %7f%n", iterationCount, delta);
-            }
-        } while (delta > epsilon && iterationCount < 25);
+        } while (delta > epsilon && iterationCount < 10000);
         // System.out.println(iterationCount);
         double pageRankSum = pageRankMap.values().stream().mapToDouble(Double::doubleValue).sum();
-        //System.out.println("PageRankSum: " + pageRankSum);
+        double avg = pageRankSum / pageRankMap.size();
         // System.out.println(pageRankMap.size());
     }
     /**

@@ -33,7 +33,6 @@ public class Crawler {
     private String[] seedURLs = {};
     /** The crawled Pages, already split in title, header and content. */
     private List<Page> crawledPages = new ArrayList<>();
-    /** private ArrayList<String> seedURLs = new ArrayList<>(); */
     /*
      * Initializes the Crawler
      * @param seedURLs seedURLs should containt the absolute URLs, where the

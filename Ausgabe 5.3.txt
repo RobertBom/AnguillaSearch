@@ -1,0 +1,32 @@
+2024-12-07 13:54:18 INFO  AnguillaSearch - Starting AnguillaSearch...
+2024-12-07 13:54:18 INFO  AnguillaSearch - Java awt GraphicsEnvironment headless: true
+2024-12-07 13:54:23 INFO  Crawler - Crawling and lemmatizing took: 4270 ms
+2024-12-07 13:54:23 INFO  Indexer - Forward Index has 64 key-value mappings.
+2024-12-07 13:54:23 INFO  Indexer - Reverse Index has 664 key-value mappings.
+TF-IDF:
+URL: http://mozzarella-and-edam.cheesy3         Score: 0.090374
+URL: http://gouda-and-muenster.cheesy3          Score: 0.073318
+URL: http://rich-mozzarella.cheesy3             Score: 0.066059
+URL: http://quark-and-slovakianbryndza.cheesy3  Score: 0.063547
+URL: http://asiago-and-brie.cheesy3             Score: 0.056027
+URL: http://nutty-lancashire.cheesy3            Score: 0.049573
+Cosine Similarity:
+URL: http://gouda-and-muenster.cheesy3          Score: 0.384790
+URL: http://mozzarella-and-edam.cheesy3         Score: 0.344232
+URL: http://rich-mozzarella.cheesy3             Score: 0.340677
+URL: http://quark-and-slovakianbryndza.cheesy3  Score: 0.289651
+URL: http://nutty-lancashire.cheesy3            Score: 0.252845
+URL: http://asiago-and-brie.cheesy3             Score: 0.243218
+Pagerank Cosine Combination:
+URL: http://gouda-and-muenster.cheesy3          Cos Score: 124% Pagerank: 176%
+URL: http://mozzarella-and-edam.cheesy3         Cos Score: 111% Pagerank: 47 %
+URL: http://rich-mozzarella.cheesy3             Cos Score: 110% Pagerank: 135%
+URL: http://quark-and-slovakianbryndza.cheesy3  Cos Score: 94 % Pagerank: 47 %
+URL: http://nutty-lancashire.cheesy3            Cos Score: 82 % Pagerank: 150%
+URL: http://asiago-and-brie.cheesy3             Cos Score: 79 % Pagerank: 47 %
+URL: http://gouda-and-muenster.cheesy3          Score: 1.372043
+URL: http://rich-mozzarella.cheesy3             Score: 1.163462
+URL: http://nutty-lancashire.cheesy3            Score: 0.988199
+URL: http://mozzarella-and-edam.cheesy3         Score: 0.951222
+URL: http://quark-and-slovakianbryndza.cheesy3  Score: 0.818845
+URL: http://asiago-and-brie.cheesy3             Score: 0.706229

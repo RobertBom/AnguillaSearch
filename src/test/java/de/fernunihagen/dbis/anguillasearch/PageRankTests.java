@@ -1,5 +1,6 @@
 package de.fernunihagen.dbis.anguillasearch;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
@@ -27,7 +28,7 @@ class PageRankTests {
         testJSONs.add(Utils.parseJSONFile("intranet/cheesy1-f126d0d3.json"));
         testJSONs.add(Utils.parseJSONFile("intranet/cheesy4-a31d2f0d.json"));
         testJSONs.add(Utils.parseJSONFile("intranet/cheesy5-d861877d.json"));
-        // testJSONs.add(Utils.parseJSONFile("intranet/cheesy6-54ae2b2e.json"));
+        testJSONs.add(Utils.parseJSONFile("intranet/cheesy6-54ae2b2e.json"));
 
         // Create a map of crawler instances and page rank instances
         pageRankForAllIntranets = new ArrayList<>();
@@ -72,18 +73,27 @@ class PageRankTests {
             
 
             // Add your code here to calculate the page rank
+            //already calculated in @BeforeAll
+
 
             // Get the page rank of the seed URLs
             for (String seedUrl : seedUrls) {
+                // find correct Map which contains seedURL
+                Map<String, Double> curPageRankMap = null;
+                for (Map<String, Double> curMap : pageRankForAllIntranets) {
+                    if(curMap.get(seedUrl) != null) {
+                        curPageRankMap = curMap;
+                    }
+                }
 
-                double seedPageRank;
+                double seedPageRank = curPageRankMap.get(seedUrl);
                 // Adjust the damping factor to match your implementation
                 double rankSource = (1.0 - 0.85) * (1.0 / numPages);
                 
-                //assertTrue(Math.abs(seedPageRank - rankSource) < 0.001);
+                assertTrue(Math.abs(seedPageRank - rankSource) < 0.001);
 
                 // Remove the following line after adding your code!
-                assertTrue(false);
+                //assertTrue(false);
             }
         }
     }
@@ -104,19 +114,26 @@ class PageRankTests {
         
 
         // Add your code here to calculate the page rank
-
+        //already calculated in @BeforeAll
+        // find correct Map which contains all seedURLs
+        Map<String, Double> curPageRankMap = null;
+        for (Map<String, Double> curMap : pageRankForAllIntranets) {
+            if (curMap.keySet().containsAll(Arrays.asList(seedUrls))) {
+                curPageRankMap = curMap;
+            }
+        }
 
         // Verify that the page rank scores are correct
         for (Map.Entry<String, Double> entry : correctPageRankScores.entrySet()) {
             String url = entry.getKey();
             double correctPageRank = entry.getValue();
 
-            double pageRankScore;
+            double pageRankScore = curPageRankMap.get(url);
 
-            //assertTrue(Math.abs(pageRankScore - correctPageRank) < 0.001);
+            assertTrue(Math.abs(pageRankScore - correctPageRank) < 0.001);
 
             // Remove the following line after adding your code!
-            assertTrue(false);
+            //assertTrue(false);
         }
     }
 }
