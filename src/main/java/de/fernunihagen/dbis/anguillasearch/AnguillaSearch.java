@@ -47,11 +47,7 @@ public final class AnguillaSearch {
         String jsonPath = null;
         int rankMode = 2;
 
-
         Map<String, String> argMap = argsParser(args);
-        for (var entry: argMap.entrySet()) {
-            System.out.format("Key:%-10s\tValue: %s%n", entry.getKey(), entry.getValue());
-        }
         if(argMap.get("-r") != null) {
             rankMode = Integer.parseInt(argMap.get("-r"));
         }
@@ -132,40 +128,58 @@ public final class AnguillaSearch {
     public static Map<String, String> argsParser(final String[] args) throws IllegalArgumentException{
         Map<String, String> argMap = new HashMap<>();
         int argCount = args.length;
+        // every argument support at maximum one parameter so we can use boolean.
+        Map<String, Boolean> validArgs = new HashMap<>();
+        validArgs.put("-r", true);
+        validArgs.put("-color", false);
 
         if( argCount == 0) {
             return argMap;
         }
         int i = 0;
-        // process all arguments of type -arg and -arg option.
+        // process all arguments of type -arg and -arg parameter.
         while (i < argCount) {
-            if(args[i].charAt(0) == '-' ) {
+            if(validArgs.containsKey(args[i])) {
                 String cArg = args[i];
-                // check if next arg exists and does not start with -,
-                // then it is the option for that argument.
-                if (i+1 < argCount && args[i+1].charAt(0) != '-') {
-                    System.out.format("Reading op for: %s%n", cArg);
-                    System.out.format("args[i+1] = %s%n", args[i+1]);
-                    String cOpt = args[i+1];
-                    argMap.put(cArg, cOpt);
-                    // the next element in args is already processed so we need to skip it
-                    i++;
-                } else {
-                    // cArg is an Argument without option.
+                if(validArgs.get(cArg)) {
+                    if(args[i+1].charAt(0) == '-') {
+                        invalidArguments(args[i+1]);
+                    }
+                    else {
+                        String cOpt = args[i+1];
+                        argMap.put(cArg, cOpt);
+                        i++;
+                    }
+                }
+                else {
                     argMap.put(cArg, "");
                 }
-                i++;
+            // the args we are reading is not in our validArgs map, but might
+            // out last argument, which is the target json or seed urls.
+            } else if (i == argCount -1) {
+                if(args[argCount -1].contains("http://") || 
+                args[argCount -1].contains("https://")) {
+                    
+                    argMap.put("seedURLs", args[argCount -1]);
+                // here we assume that 
+                } else if(args[argCount -1].charAt(0) != '-') {
+                    argMap.put("jsonPath", args[argCount -1]);
+                }
+            } else {
+                invalidArguments(args[i]);
             }
+            i++;
         }
-        // check if all args have been processed
-        if (i < argCount - 1) {
-            if(args[argCount -1].contains("http://") || 
-            args[argCount -1].contains("https://")) {
-                
-                argMap.put("seedURLs", args[argCount -1]);
-            // here we assume that 
-            } else if(args[argCount -1].charAt(0) != '-') {
-                argMap.put("jsonPath", args[argCount -1]);
+        // check if the parameter for argument -r is in range.
+        if(argMap.containsKey("-r")) {
+            if(!argMap.get("-r").matches("^[012]$")) {
+                System.out.println("-r option only accepts 0, 1 or 2 as" 
+                                    + " parameter.");
+                System.out.println("0 - TF-IDF ranking.");
+                System.out.println("1 - Cosine similarity ranking.");
+                System.out.println("2 - Combination of TF-IDF and cosine "
+                                    + "similarity.");
+                System.exit(2);
             }
         }
         return argMap;
@@ -227,5 +241,13 @@ public final class AnguillaSearch {
             outString = outString.replaceAll( "(?i)" + match, "\u001B[32m" + match + "\u001B[0m");
         }
         return outString;
+    }
+    private static void invalidArguments(String unrecognized) {
+        System.out.println("Unrecognized option: " + unrecognized);
+        System.out.println("Try 'java -jar AnguillaSearch.java --help'");
+        System.exit(1);
+    }
+    private static void printHelp() {
+
     }
 }
