@@ -22,6 +22,7 @@ import java.util.Queue;
  * or by providing a String array with the Seed-URLs directly.
  */
 public class Crawler {
+    /** LOGGER */
     private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
     /** The Number of Links the crawler has found. */
     private int numLinks = 0;
@@ -78,7 +79,9 @@ public class Crawler {
                 LOGGER.warn("Failed to fetch: {}", curURL);
             }
             if (crawledPages.size() % 100 == 0) {
-                LOGGER.info("Crawled {} pages.", crawledPages.size());
+                if(LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Crawled {} pages.", crawledPages.size());
+                }
             }
         }
         //Document curSite = Jsoup.connect(null)

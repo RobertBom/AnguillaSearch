@@ -82,7 +82,6 @@ public abstract class Parser {
         workString = workString.replaceAll(stopWordRegex, "");
         return workString;
     }
-
     /**
      * Tokenizes and lemmatizes the input String.
      * e.g. 

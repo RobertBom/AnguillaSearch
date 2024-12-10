@@ -23,7 +23,8 @@ import org.slf4j.LoggerFactory;
  * a reverse index to provide various functions.
  * 
  */
-public class Indexer {
+public class Indexer { 
+    /** Creating Logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(Indexer.class);
     /** The Crawler provides us with a list of fetched pages.*/
     private Crawler crawler;
@@ -54,9 +55,7 @@ public class Indexer {
         crawler = new Crawler(seedURLs);
         crawler.crawl();
         this.pageList = crawler.getCrawledPages();
-        buildrevIndex();
-        buildTokenVector();
-        buildForwardIndex();
+        init();
     }
     /**
      * Sets the data source for the index to the provided list of pages.
@@ -65,12 +64,7 @@ public class Indexer {
      */
     Indexer(final List<Page> pageList) {
         this.pageList = pageList;
-        buildrevIndex();
-        buildTokenVector();
-        buildForwardIndex();
-    }
-    public void testPageRank() {
-        new PageRank(pageList);
+        init();
     }
     /**
      * Builds a forward index of all the pages in the provided list.
@@ -80,6 +74,11 @@ public class Indexer {
      * page1 : ["discover", "world", "of", "divine"]
      * page2 : ["explore", "world", "cheese", "manchego"]
      */
+    private void init() {
+        buildrevIndex();
+        buildTokenVector();
+        buildForwardIndex();
+    }
     private void buildForwardIndex() {
         for (Page crawledPage : pageList) {
             fwdIndex.put(crawledPage, crawledPage.getFilteredLemmaList(),
@@ -114,6 +113,10 @@ public class Indexer {
             }
         }
     }
+    /**
+     * Builds the vector IDF (Inverse Document Frequency) vector of all 
+     * tokens.
+     */
     private void buildTokenVector() {
         tokenIDFVector = new TokenIDF[revIndex.size()];
         int i = 0;
@@ -134,11 +137,22 @@ public class Indexer {
         return revIndex.get(key);
     }
     /**
+     * Returns the number of pages indexed.
+     * @return the number of pages indexed.
+     */
+    public int getPagesIndexed() {
+        return fwdIndex.size();
+    }
+    /**
      * Print the amount of keys in the forward and revese index.
      */
     public void printInfo() {
-        LOGGER.info("Forward Index has {} key-value mappings.", fwdIndex.size());
-        LOGGER.info("Reverse Index has {} key-value mappings.", revIndex.size());
+        if(LOGGER.isInfoEnabled()) {
+            LOGGER.info("Forward Index has {} key-value mappings.",
+                        fwdIndex.size());
+            LOGGER.info("Reverse Index has {} key-value mappings.", 
+                        revIndex.size());
+        }
     }
     /**
      * Calculates the IDF (Inverted Document Frequency) for a provided token.
@@ -219,7 +233,7 @@ public class Indexer {
             case 1:
                 return rankCosineSimilarity(pageSet, searchTokenList);
             case 2:
-                return rankPageCosine(pageSet, searchTokenList);
+                return rankCombCosSimPageRank(pageSet, searchTokenList);
             default:
                 return rankTFIDF(pageSet, searchTokenList);
         }
@@ -245,7 +259,7 @@ public class Indexer {
             for (String searchToken : searchTokenList) {
                 tfidfSum += calcTFIDF(searchToken, p);
             }
-            searchResults.add(new SearchResult(p.getURL(), tfidfSum));
+            searchResults.add(new SearchResult(p.getURL(), p, tfidfSum));
         }
 
         // In the tokenList.sort line no checkstyle error, 
@@ -272,8 +286,8 @@ public class Indexer {
             String curSearchToken = stIter.next();
             // while our current search token is lexicographically greater, we 
             // move forward in the tokenIDFVector
-            while (curSearchToken.compareTo(tokenIDFVector[i].token()) > 0 &&
-                                                                    i < vecL) {
+            while (curSearchToken.compareTo(tokenIDFVector[i].token()) > 0 
+                   &&  i < vecL) {
                 i++;
             }
             if (curSearchToken.compareTo(tokenIDFVector[i].token()) == 0) {
@@ -289,7 +303,8 @@ public class Indexer {
 
             curScore = cosineSimilarity(searchV, 
                                         fwdIndex.getTFIDFVector(curPage));
-            searchResults.add(new SearchResult(curPage.getURL(), curScore));
+            searchResults.add(new SearchResult(curPage.getURL(), 
+                              curPage, curScore));
         }
         // sort the search results by score descending.
         searchResults.sort((a, b) ->  (b.score() < a.score() ? -1 : 1));
@@ -297,15 +312,32 @@ public class Indexer {
 
         return searchResults;
     }
-    public List<SearchResult> rankPageCosine(final Set<Page> filteredPageSet,
+    /**
+     * Ranks search results based on a combination of the cosine similarity and
+     * pagerank. 
+     * It calculates the average for both the cosine similarity and the
+     * pagerank. It then converts the respective ratings to a percent rating of
+     * the average and then combines them to one score with a weight of 0.75
+     * cosine similarity and 0.25 pagerank.
+     * e.g. the average cosine similarity score across the search results is
+     * 0.2. The average pagerank score is 0.001. 
+     * Our page has a a cosine simlarity score of 0.3 and a pagerank of 0.0005.
+     * After normalizing the scores to the averages our has a 1.5 cosine
+     * similarity score and a 0.5 pagerank score.
+     * The combined score is 1.5 * 0.75 + 0.5 * 0.25 = 1.25.
+     * @param searchResultSet set of pages which should be ranked
+     * @param searchTokenList tokens of the searchquery
+     * @return sorted list of search results, descencing order by their score.
+     */
+    public List<SearchResult> rankCombCosSimPageRank(final Set<Page> searchResultSet,
                                 final TreeSet<String> searchTokenList) {
-        List<SearchResult> searchResults = new ArrayList<>(filteredPageSet.size());
+        List<SearchResult> searchResults = new ArrayList<>(searchResultSet.size());
         /** How much the normalized cosine scores weigh in contrast to 
          * the corresponding pagerank score */
         final double cosWeight = 0.75;
 
         // getting data
-        List<SearchResult> cosineResults = rankCosineSimilarity(filteredPageSet, searchTokenList);
+        List<SearchResult> cosineResults = rankCosineSimilarity(searchResultSet, searchTokenList);
         PageRank pageRank = new PageRank(pageList);
         // pageRankMap contains the pagerank for ALL pages crawled
         Map<String, Double> allPageRankMap = pageRank.getPageRankMap();
@@ -348,10 +380,10 @@ public class Indexer {
             pageRankScore = pageRankScore / avgPageRankScore.getAsDouble();
 
             // relative values
-            System.out.format("URL: %-40s\tCos Score: %-3.0f%%\tPagerank: %-3.0f%%%n", cosRes.url(), cosineScore*100, pageRankScore*100);
+            //System.out.format("URL: %-40s\tCos Score: %-3.0f%%\tPagerank: %-3.0f%%%n", cosRes.url(), cosineScore*100, pageRankScore*100);
             double newScore =   cosWeight * cosineScore +
                                 (1- cosWeight) * pageRankScore;
-            searchResults.add(new SearchResult(cosRes.url(), newScore));
+            searchResults.add(new SearchResult(cosRes.url(), cosRes.page() , newScore));
         }
         // Sort the resuls by score.
         searchResults.sort( (a,b) -> (b.score() < a.score() ? -1 : 1));

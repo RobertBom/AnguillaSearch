@@ -37,7 +37,7 @@ public class Page implements Comparable<Page> {
     // Constructor without lemmatizing, a lot faster, useful for running tests
     // that do not need lemmatization.
     Page(final String url, final String title, final String header, 
-        final String content, final Set<String> linkSet, boolean noLemma) {
+        final String content, final Set<String> linkSet, final boolean noLemma) {
             this.url = url;
             this.title = title;
             this.header = header;
@@ -58,19 +58,39 @@ public class Page implements Comparable<Page> {
      * @return  List of links found on the Website.
      */
     public Set<String> getLinks() {
-        return linkSet;
+        return (new HashSet<String>(linkSet));
     }
-
+    /**
+     * Returns the title of the page.
+     * @return the title of the page.
+     */
+    public String getTitle() {
+        return this.title;
+    }
+    /**
+     * Returns the content of the page.
+     * @return the content of the page.
+     */
+    public String getContent() {
+        return this.content;
+    }
+    /**
+     * Return the content of the header part of the page.
+     * @return the header of the page.
+     */
+    public String getHeader() {
+        return this.header;
+    }
     /**
      * Returns the URL of the Page Object.
-     * @return the URL of the Page Object
+     * @return the URL of the Page Object.
      */
     protected String getURL() {
         return url;
     }
 
     /** Simple compareTo function which uses the url attribute and
-     * String.compareTo()
+     *  String.compareTo()
      * @param p other Page to compare to.
      * @return 0 if the the url attributes of both Pages are the same .
      * < 0 if the url is lexicographically less than the url of p. else > 0 

@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 public class PageRank {
     /**
@@ -13,9 +12,9 @@ public class PageRank {
      * link to the page specified in the key. We use a set, so we treat 
      * multiple outbound links of a page to another as one.
      */
-    private Map<String, linkMapElem> linkMap = new TreeMap<>();
+    private Map<String, LinkMapElem> linkMap = new TreeMap<>();
     private Map<String, Double> pageRankMap = new TreeMap<>();
-    private double dampingFactor = 0.85;
+    static final double DAMPING_FACTOR = 0.85;
     
     
 
@@ -32,7 +31,7 @@ public class PageRank {
         // create a map entry with empty set for every page
         // and the outgoing link count
         for(Page curPage : pageList){
-            linkMapElem insert = new linkMapElem(new HashSet<>(),
+            LinkMapElem insert = new LinkMapElem(new HashSet<>(),
                                                 curPage.getLinks().size());
             linkMap.put(curPage.getURL(), insert);
         }
@@ -71,24 +70,24 @@ public class PageRank {
             Map<String, Double> newPageRankMap = new TreeMap<>();
             delta = 0;
             // iterate through all pages.
-            for (String curPage : pageRankMap.keySet()) {
-                double oldPageR = pageRankMap.get(curPage);
+            for (Map.Entry<String, Double> prEntry : pageRankMap.entrySet()) {
+                double oldPageR = prEntry.getValue();
                 double newPageR = 0;
                 // calculate the Pagerank for current page.
                 // get a Set of all pages linking to pURL
-                Set<String> linksToCurPageSet = linkMap.get(curPage).inBoundLinkSet();
+                Set<String> linksToCurPageSet = linkMap.get(prEntry.getKey()).inBoundLinkSet();
                 // iterate through every page to links tu curPage and cumulate
                 // the new Pagerank value
                 for(String linksToCurPage : linksToCurPageSet) {
                     double prj = pageRankMap.get(linksToCurPage);
                     int cj = linkMap.get(linksToCurPage).outBoundLinks();
-                    newPageR += dampingFactor * (prj / cj);
+                    newPageR += DAMPING_FACTOR * (prj / cj);
                 }
                 // add Ranksource
-                newPageR += (1 - dampingFactor) * n;
+                newPageR += (1 - DAMPING_FACTOR) * n;
                 delta += Math.abs(oldPageR - newPageR);
                 // save new PageRank to out new map
-                newPageRankMap.put(curPage, newPageR);
+                newPageRankMap.put(prEntry.getKey(), newPageR);
                 //System.out.format("URL: %-50s old PR: %5f new PR: %5f%n", curPage, oldPageR, newPageR);
                 
             }
@@ -107,7 +106,7 @@ public class PageRank {
      */
     protected int getTotalInBoundLinks() {
         int countInBound = 0;
-        for (linkMapElem curElem : linkMap.values()) {
+        for (LinkMapElem curElem : linkMap.values()) {
             // curElem.inBoundLinkSet() is the Set of all inbound links for
             // current map element. size() is the count of inbound links to
             // that element.
@@ -123,7 +122,7 @@ public class PageRank {
      * was not found
      */
     protected int getNumInboundLinks(final String url) {
-        Set curSet = linkMap.get(url).inBoundLinkSet();
+        Set<String> curSet = linkMap.get(url).inBoundLinkSet();
         if (curSet == null) {
             return -1;
         } else {
@@ -133,7 +132,7 @@ public class PageRank {
     protected Map<String, Double> getPageRankMap() {
         return pageRankMap;
     }
-    private record linkMapElem (
+    private record LinkMapElem (
         Set<String> inBoundLinkSet,
         int outBoundLinks
     ) { }
