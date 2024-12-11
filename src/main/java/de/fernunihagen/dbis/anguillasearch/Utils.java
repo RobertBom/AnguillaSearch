@@ -28,9 +28,11 @@ public class Utils {
         File folder = new File(fN);
         File[] files = folder.listFiles();
         // Iterate over all files
-        for (File file : files) {
-            // Parse the JSON file
-            jsonObjects.add(parseJSONFile(file.getAbsolutePath()));
+        if (files != null) {
+            for (File file : files) {
+                // Parse the JSON file
+                jsonObjects.add(parseJSONFile(file.getAbsolutePath()));
+            }
         }
         return jsonObjects;
     }
