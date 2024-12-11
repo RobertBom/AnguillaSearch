@@ -99,7 +99,10 @@ public class Page implements Comparable<Page> {
     public int compareTo(final Page p) {
         return this.url.compareTo(p.getURL());
     }
-
+    /**
+     * Returns a list of all lemmas contained in the page.
+     * @return a list of all lemmas the page contains.
+     */
     protected List<String> getFilteredLemmaList() {
         return filteredLemmaList;
     }

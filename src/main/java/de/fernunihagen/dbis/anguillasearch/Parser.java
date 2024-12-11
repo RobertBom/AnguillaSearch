@@ -24,6 +24,7 @@ public abstract class Parser {
     /** variable to save the Regex for Stopword Removal, so we
      *  have to build it only once */
     private static String stopWordRegex = null;
+    /** Pipeline for tokenizing and lemmatizing. */
     private static StanfordCoreNLP pipeline = null;
 
      /**
@@ -58,7 +59,6 @@ public abstract class Parser {
      * @return the inputString, but without stopwords.
     */
     public static String rmStopWords(final String inputString) {
-        /** the String we work on */
         String workString = inputString;
         if (stopWordRegex == null) {
             try {
@@ -71,10 +71,10 @@ public abstract class Parser {
                     strB.append(stopword + "|");
                 }
                 //remove replace last | by )
-                strB.setCharAt(strB.length() -1, ')');
+                strB.setCharAt(strB.length() - 1, ')');
                 strB.append("\\b");
                 stopWordRegex = strB.toString();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 System.out.println("Failed to load Stopwordlist.");
                 System.out.println(e.toString());
             }
@@ -95,9 +95,6 @@ public abstract class Parser {
      */
     public static List<String> tokLem(final String inputString) {
         ArrayList<String> outputList = new ArrayList<>();
-        
-        /** the String which we manipulate to get the tokenized and
-         * lemmatized result */
         String workString = inputString;
 
         // remove \, |, and punctiation marks.

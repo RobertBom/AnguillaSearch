@@ -19,7 +19,7 @@ public class RevIndex {
         return indexMap.get(key);
     }
     /**
-     * Inserts the specified pair of 
+     * Inserts the specified pair of (URL , MAP(URL, Page)).
      * @param token the token, of which a Reverse Index element should be
      * created.
      * @param newPageMap a Map<String, Page> of (URL, Page) pairs which contain
@@ -27,7 +27,8 @@ public class RevIndex {
      * @return the previous Map<String, Page> associated with that token, null
      * if there was nothing associated the token before.
      */
-    protected Map<String, Page> put(final String token,final Map<String, Page> newPageMap) {
+    protected Map<String, Page> put(final String token,
+                                    final Map<String, Page> newPageMap) {
         return indexMap.put(token, newPageMap);
     }
     /**

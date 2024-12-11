@@ -13,11 +13,15 @@ public class PageRank {
      * multiple outbound links of a page to another as one.
      */
     private Map<String, LinkMapElem> linkMap = new TreeMap<>();
+    /** Map of Pageranks, the key is the url and the value the pagerankrating. */
     private Map<String, Double> pageRankMap = new TreeMap<>();
+    /** Damping factor of weight between pagerankrating and ranksource values. */
     static final double DAMPING_FACTOR = 0.85;
+    /** How much small the difference between pagerank iterations has to be. */
+    static final double EPSILON = 0.0001;
+    /** Maximum pagerank iterations to prevent a neverending loop. */
+    static final int MAXPAGERANKIT = 10000;
     
-    
-
     PageRank(final Collection<Page> pageList) {
         buildInbLinkList(pageList);
         rankPages();
@@ -30,7 +34,7 @@ public class PageRank {
     private void buildInbLinkList(final Collection<Page> pageList) {
         // create a map entry with empty set for every page
         // and the outgoing link count
-        for(Page curPage : pageList){
+        for (Page curPage : pageList) {
             LinkMapElem insert = new LinkMapElem(new HashSet<>(),
                                                 curPage.getLinks().size());
             linkMap.put(curPage.getURL(), insert);
@@ -39,7 +43,7 @@ public class PageRank {
         // iterate through all pages again, Seed URLs will contain empty set, 
         // since no other site links to them.
         for (final Page curPage : pageList) {
-            for(String outLink : curPage.getLinks()) {
+            for (String outLink : curPage.getLinks()) {
                 /* curSet can't be null, since the crawler did crawl every
                    every outgoing link. In the loop above we created a set
                    for every page. */
@@ -61,11 +65,10 @@ public class PageRank {
         for (String key : linkMap.keySet()) {
             pageRankMap.put(key, n);
         }
-        
-        double epsilon = 0.0001;
         int iterationCount = 0;
         double delta = 0;
-        // Calculate new PageRanks till the cumulated absolute delta is smaller epsilon
+        // Calculate new PageRanks till the cumulated absolute 
+        // delta is smaller than EPSILON
         do {
             Map<String, Double> newPageRankMap = new TreeMap<>();
             delta = 0;
@@ -75,10 +78,11 @@ public class PageRank {
                 double newPageR = 0;
                 // calculate the Pagerank for current page.
                 // get a Set of all pages linking to pURL
-                Set<String> linksToCurPageSet = linkMap.get(prEntry.getKey()).inBoundLinkSet();
+                Set<String> linksToCurPageSet = linkMap.get(prEntry.getKey())
+                                                            .inBoundLinkSet();
                 // iterate through every page to links tu curPage and cumulate
                 // the new Pagerank value
-                for(String linksToCurPage : linksToCurPageSet) {
+                for (String linksToCurPage : linksToCurPageSet) {
                     double prj = pageRankMap.get(linksToCurPage);
                     int cj = linkMap.get(linksToCurPage).outBoundLinks();
                     newPageR += DAMPING_FACTOR * (prj / cj);
@@ -94,9 +98,12 @@ public class PageRank {
             // switch old pageRanks with new pageRanks
             pageRankMap = newPageRankMap;
             iterationCount++;
-        } while (delta > epsilon && iterationCount < 10000);
+        } while (delta > EPSILON && iterationCount < MAXPAGERANKIT);
         // System.out.println(iterationCount);
-        double pageRankSum = pageRankMap.values().stream().mapToDouble(Double::doubleValue).sum();
+        double pageRankSum = pageRankMap.values()
+                                .stream()
+                                .mapToDouble(Double::doubleValue)
+                                .sum();
         double avg = pageRankSum / pageRankMap.size();
         // System.out.println(pageRankMap.size());
     }
@@ -129,6 +136,11 @@ public class PageRank {
             return curSet.size();
         }
     }
+    /**
+     * Returns a map of the pageranks.
+     * The key is the url of the page and the value the according pagerank.
+     * @return a map of the pageranks.
+     */
     protected Map<String, Double> getPageRankMap() {
         return pageRankMap;
     }
