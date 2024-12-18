@@ -51,8 +51,6 @@ public class Page implements Comparable<Page> {
             }
     }
 
-    
-
     /**
      * Returns a list of links found on the Website.
      * @return  List of links found on the Website.
@@ -105,6 +103,14 @@ public class Page implements Comparable<Page> {
      */
     protected List<String> getFilteredLemmaList() {
         return filteredLemmaList;
+    }
+    /**
+     * Removes the specified link from the page.
+     * @param link link which should be removed from the pages linkset.
+     * @return true if the link was in the page.
+     */
+    protected boolean removeLink (String link) {
+        return linkSet.remove(link);
     }
     /**
      * Prints all the attributes of the Page.

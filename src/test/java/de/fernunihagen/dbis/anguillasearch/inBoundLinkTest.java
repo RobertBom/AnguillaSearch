@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
 /**
  * Test that checks if the data of inbound links.
  */
-public class inBoundLinkTest {
+public class InBoundLinkTest {
     // copy of CrawlerTests.java
     static List<JsonObject> testJSONs = new ArrayList<>();
 

@@ -33,7 +33,8 @@ public class Crawler {
     /** The Seed-URLs, starting point for the crawling process. */
     private String[] seedURLs = {};
     /** The crawled Pages, already split in title, header and content. */
-    private List<Page> crawledPages = new ArrayList<>();
+    private List<Page> crawledPages = new LinkedList<>();
+    private int maxPages = 2147483647;
     /*
      * Initializes the Crawler
      * @param seedURLs seedURLs should containt the absolute URLs, where the
@@ -46,6 +47,15 @@ public class Crawler {
             knownURL.add(current);
         }
     }
+    Crawler(final String[] seedURLs, int maxPages) {
+        this.seedURLs = seedURLs;
+        this.maxPages = maxPages;
+        for (String current : seedURLs) {
+            queue.add(current);
+            knownURL.add(current);
+        }
+    }
+
 
     /**
      * Crawls the provided net starting from the Seed-URLs.
@@ -58,7 +68,7 @@ public class Crawler {
         String curURL;
 
         //crawl every website following links
-        while (!queue.isEmpty()) {
+        while (!queue.isEmpty() && crawledPages.size() < maxPages) {
             curURL = queue.poll();
             try {
                 doc = Jsoup.connect(curURL).get();
