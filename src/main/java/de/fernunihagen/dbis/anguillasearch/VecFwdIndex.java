@@ -34,6 +34,9 @@ public class VecFwdIndex extends FwdIndex {
             double tf = Indexer.calcTF(tokenIDFVector[i].token(), page);
             tfidfVector[i] =tf * tokenIDFVector[i].idf();
         }
+        // normalize all tfidfVectors to length 1so we can skip a calculation
+        // step later
+        tfidfVector = Indexer.normalizeVector(tfidfVector);
         tfidfMap.put(page, tfidfVector);
         return ret;
     }

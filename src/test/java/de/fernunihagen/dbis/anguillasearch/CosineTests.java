@@ -21,6 +21,11 @@ class CosineTests {
         // The cosine similarity of two equal vectors should be 1.0
         // Replace the cosineSimilarity method with your implementation
         assertEquals(1.0, Indexer.cosineSimilarity(vectorA, vectorB));
+
+        //Testing vector normalizsation which should have no effect on the cosine similarity
+        double[] vectorANorm = Indexer.normalizeVector(vectorA);
+        double[] vectorBNorm = Indexer.normalizeVector(vectorB);
+        assertEquals(1.0, Indexer.cosineSimilarity(vectorANorm, vectorBNorm));
     }
 
     @Test
@@ -31,6 +36,11 @@ class CosineTests {
         // The cosine similarity of two orthogonal vectors should be 0.0
         // Replace the cosineSimilarity method with your implementation
         assertEquals(0.0, Indexer.cosineSimilarity(vectorA, vectorB));
+
+        //Testing vector normalizsation which should have no effect on the cosine similarity
+        double[] vectorANorm = Indexer.normalizeVector(vectorA);
+        double[] vectorBNorm = Indexer.normalizeVector(vectorB);
+        assertEquals(0.0, Indexer.cosineSimilarity(vectorANorm, vectorBNorm));
     }
 
     @Test
@@ -42,6 +52,12 @@ class CosineTests {
         // Replace the cosineSimilarity method with your implementation
         assertTrue(Indexer.cosineSimilarity(vectorA, vectorB) > 0.0);
         assertTrue(Indexer.cosineSimilarity(vectorA, vectorB) < 1.0);
+
+        //Testing vector normalizsation which should have no effect on the cosine similarity
+        double[] vectorANorm = Indexer.normalizeVector(vectorA);
+        double[] vectorBNorm = Indexer.normalizeVector(vectorB);
+        assertTrue(Indexer.cosineSimilarity(vectorANorm, vectorBNorm) > 0.0);
+        assertTrue(Indexer.cosineSimilarity(vectorANorm, vectorBNorm) < 1.0);
     }
 
     @Test
@@ -52,5 +68,10 @@ class CosineTests {
         // The cosine similarity of these vectors should be 0.7
         // Replace the cosineSimilarity method with your implementation
         assertTrue(Math.abs(Indexer.cosineSimilarity(vectorA, vectorB) - 0.6364) < 0.0001);
+
+        //Testing vector normalizsation which should have no effect on the cosine similarity
+        double[] vectorANorm = Indexer.normalizeVector(vectorA);
+        double[] vectorBNorm = Indexer.normalizeVector(vectorB);
+        assertTrue(Math.abs(Indexer.cosineSimilarity(vectorANorm, vectorBNorm) - 0.6364) < 0.0001);
     }
 }

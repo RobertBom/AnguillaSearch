@@ -115,7 +115,7 @@ public class Indexer {
     }
     /**
      * Builds the vector IDF (Inverse Document Frequency) vector of all 
-     * tokens.
+     * tokens. Normalizes all vector to length 1.
      */
     private void buildTokenVector() {
         tokenIDFVector = new TokenIDF[revIndex.size()];
@@ -152,6 +152,14 @@ public class Indexer {
                         fwdIndex.size());
             LOGGER.info("Reverse Index has {} key-value mappings.", 
                         revIndex.size());
+        }
+    }
+    /**
+     * Logs the search results with their corresponding score for debug purposes
+     */
+    private void logSearchResults(List<SearchResult> searchResults) {
+        for (SearchResult searchResult : searchResults) {
+            LOGGER.info("Site: {} has Score {}", searchResult.url(), searchResult.score());
         }
     }
     /**
@@ -241,7 +249,7 @@ public class Indexer {
                  */
                 double[] weights = new double[searchTokenSet.size()];
                 Arrays.fill(weights, 0.0);
-                
+
                 List<String> searchTokenList = Parser.tokLem(searchString);
                 Iterator<String> iter = searchTokenSet.iterator();
                 int i = 0;
@@ -254,12 +262,7 @@ public class Indexer {
                     }
                     i++;
                 }
-
-                iter = searchTokenSet.iterator();
-                i = 0;
-                while (iter.hasNext()) {
-                    i++;
-                }
+                return rankCosineSimilarity(pageSet, searchTokenSet, weights);
             default:
                 return rankTFIDF(pageSet, searchTokenSet);
         }
@@ -335,23 +338,29 @@ public class Indexer {
                 searchV[i] = 1 * weights[iWeight];
                 iWeight++;
             }
-
         }
-        
+
+        /* we normalize the searchvector to a length of 1 so we can skip the
+        * calulation of the euclidian norm. The divisor is 1 times 1 then. */
+        searchV = normalizeVector(searchV);
         // iterate through pages and rank then using cosine similarity.
         Iterator<Page> pIter = pageSet.iterator();
         while (pIter.hasNext()) {
             Page curPage = pIter.next();
             double curScore = -1; // debug value
 
-            curScore = cosineSimilarity(searchV, 
-                                        fwdIndex.getTFIDFVector(curPage));
+            /* curScore = cosineSimilarity(searchV, 
+                                        fwdIndex.getTFIDFVector(curPage)); */
+            /* because the searchV and all the TFIDF vector saved in the  
+             * are normalized to a length of 1, we can skip the divisor and
+             * just use the dotproduct.
+            */
+            curScore = dotProduct(searchV, fwdIndex.getTFIDFVector(curPage));
             searchResults.add(new SearchResult(curPage.getURL(), 
                               curPage, curScore));
         }
         // sort the search results by score descending.
         searchResults.sort((a, b) ->  (b.score() < a.score() ? -1 : 1));
-
         return searchResults;
     }
     /**
@@ -552,6 +561,22 @@ public class Indexer {
     static double cosineSimilarity(final double[] a, final double[] b) {
         return dotProduct(a, b) / 
         (calcEuclidianNorm(a) * calcEuclidianNorm(b));
+    }
+    /**
+     * normalizes the vector so its eucldian norm is 1.
+     * The direction doesn't change.
+     * @param inVector the vector that should be normalized
+     * @return a new vector which has the same direction with the length of 1.
+     */
+    static double[] normalizeVector(final double[] inVector) {
+        double length = calcEuclidianNorm(inVector);
+        //System.out.println("Vector length is: " + length);
+        double[] normalizedVector = new double[inVector.length];
+        for (int i = 0; i < normalizedVector.length; i++) {
+            normalizedVector[i] = inVector[i] / length;
+        }
+        //System.out.println("Normalized length is: " + calcEuclidianNorm(normalizedVector));
+        return normalizedVector;
     }
 
 }
