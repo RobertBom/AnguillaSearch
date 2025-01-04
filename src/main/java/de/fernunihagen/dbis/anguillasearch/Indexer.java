@@ -11,8 +11,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 
 
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Indexer { 
     /** Creating Logger */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Indexer.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(Indexer.class);
     /** The Crawler provides us with a list of fetched pages.*/
     private Crawler crawler;
     /** A list of pages which is used as data source.*/
@@ -147,19 +147,22 @@ public class Indexer {
      * Print the amount of keys in the forward and revese index.
      */
     public void printInfo() {
-        if(LOGGER.isInfoEnabled()) {
+        /*if(LOGGER.isInfoEnabled()) {
             LOGGER.info("Forward Index has {} key-value mappings.",
                         fwdIndex.size());
             LOGGER.info("Reverse Index has {} key-value mappings.", 
                         revIndex.size());
-        }
+        }*/
+        System.out.format("Forward Index has %d key-value mappings.%n", fwdIndex.size());
+        System.out.format("Reverse Index has %d key-value mappings.", revIndex.size());
     }
     /**
      * Logs the search results with their corresponding score for debug purposes
      */
     private void logSearchResults(List<SearchResult> searchResults) {
         for (SearchResult searchResult : searchResults) {
-            LOGGER.info("Site: {} has Score {}", searchResult.url(), searchResult.score());
+            //LOGGER.info("Site: {} has Score {}", searchResult.url(), searchResult.score());
+            System.out.format("Site: %s has Score %f", searchResult.url(), searchResult.score());
         }
     }
     /**
