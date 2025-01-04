@@ -90,6 +90,10 @@ public final class AnguillaSearch {
                 System.out.println("Combination of Cosine Similarity and"
                                    + " Pagerank.");
                 break;
+            case 3:
+                System.out.println("3 - Cosine similarity ranking with weights. "
+                + "If a specific word is multiple times in the searchquery it will be weighted accordingly.");
+                break;
             default:
                 System.out.println("Unknown");
                 break;
@@ -116,7 +120,7 @@ public final class AnguillaSearch {
      * List of SeedURls
      * -r Integer pathToJson
      * -r Integer List of SeedURLs
-     * The Integer has to be 0, 1 or 2 and selects the ranking method.
+     * The Integer has to be 0, 1, 2 or 3 and selects the ranking method.
      * It returns a map with the possible keys: "-r", "json" "seedURLs" with
      * their corresponding List of Strings.
      * @param args arguments passed with program call
@@ -169,13 +173,15 @@ public final class AnguillaSearch {
         }
         // check if the parameter for argument -r is in range.
         if (argMap.containsKey("-r")) {
-            if (!argMap.get("-r").matches("^[012]$")) {
-                System.out.println("-r option only accepts 0, 1 or 2 as" 
+            if (!argMap.get("-r").matches("^[0123]$")) {
+                System.out.println("-r option only accepts 0, 1, 2 or 3 as" 
                                     + " parameter.");
                 System.out.println("0 - TF-IDF ranking.");
                 System.out.println("1 - Cosine similarity ranking.");
                 System.out.println("2 - Combination of TF-IDF and cosine "
                                     + "similarity.");
+                System.out.println("3 - Cosine similarity ranking with weights. "
+                                    + "If a specific word is multiple times in the searchquery it will be weighted accordingly.");
                 System.exit(2);
             }
         }
@@ -219,10 +225,9 @@ public final class AnguillaSearch {
         String firstSentence = null;
         List<String> matchedLemmaList = new ArrayList<>();
 
-
         for (int i = 0; i < sentences.length && firstSentence == null; i++) {
             for (String lemma : queryLemmas) {
-                if (sentences[i].contains(lemma)) {
+                if (sentences[i].toLowerCase().contains(lemma)) {
                     firstSentence = sentences[i];
                     matchedLemmaList.add(lemma);
                 }

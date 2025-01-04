@@ -216,26 +216,52 @@ public class Indexer {
     public List<SearchResult> searchQuery(final String searchString,
                                          final int explRankMode) {
         // TreeSet eliminates duplicates and sorts our Token
-        TreeSet<String> searchTokenList = new TreeSet<>(
+        TreeSet<String> searchTokenSet = new TreeSet<>(
                                                 Parser.tokLem(searchString));
         Set<Page> pageSet = new TreeSet<>();
 
         // Build a list of all Pages which contains at least one of the search
         // token.
-        for (String searchToken : searchTokenList) {
+        for (String searchToken : searchTokenSet) {
             if (revIndex.get(searchToken) != null) {
                 pageSet.addAll(revIndex.get(searchToken).values());
             }
         }
         switch (explRankMode) {
             case 0:
-                return rankTFIDF(pageSet, searchTokenList);
+                return rankTFIDF(pageSet, searchTokenSet);
             case 1:
-                return rankCosineSimilarity(pageSet, searchTokenList);
+                return rankCosineSimilarity(pageSet, searchTokenSet);
             case 2:
-                return rankCombCosSimPageRank(pageSet, searchTokenList);
+                return rankCombCosSimPageRank(pageSet, searchTokenSet);
+            case 3:
+                /*
+                 * ranking by cosine similarity with weights, for every time
+                 *  the token is is present 1 will be added to the weight.
+                 */
+                double[] weights = new double[searchTokenSet.size()];
+                Arrays.fill(weights, 0.0);
+                
+                List<String> searchTokenList = Parser.tokLem(searchString);
+                Iterator<String> iter = searchTokenSet.iterator();
+                int i = 0;
+                while (iter.hasNext()) {
+                    String curTokenSet = iter.next();
+                    for (String curTokenList : searchTokenList) {
+                        if (curTokenSet.equals(curTokenList)) {
+                            weights[i] += 1;
+                        }
+                    }
+                    i++;
+                }
+
+                iter = searchTokenSet.iterator();
+                i = 0;
+                while (iter.hasNext()) {
+                    i++;
+                }
             default:
-                return rankTFIDF(pageSet, searchTokenList);
+                return rankTFIDF(pageSet, searchTokenSet);
         }
     }
     /**
@@ -267,8 +293,21 @@ public class Indexer {
         searchResults.sort((a, b) ->  (b.score() < a.score() ? -1 : 1));
         return searchResults;
     }
+    /**
+     * Ranks pageSet by cosine similarity to the list of search tokens, with no weights.
+     * @param pageSet set of pages, which should be ranked
+     * @param searchTokenList list of search tokens
+     * @return ranked and sorted (descending by score) SearchResult list.
+     */
     private List<SearchResult> rankCosineSimilarity(final Set<Page> pageSet, 
-                                    final TreeSet<String> searchTokenList) {
+    final TreeSet<String> searchTokenList) {
+        double[] weights = new double[revIndex.size()];
+        Arrays.fill(weights, 1.0);
+        return rankCosineSimilarity(pageSet, searchTokenList, weights);
+    }
+
+    private List<SearchResult> rankCosineSimilarity(final Set<Page> pageSet, 
+                                    final TreeSet<String> searchTokenList, double[] weights) {
         List<SearchResult> searchResults = new ArrayList<>(pageSet.size());
         int vecL = tokenIDFVector.length;
 
@@ -281,6 +320,8 @@ public class Indexer {
         *  now.
         */
         int i = 0;
+        // the index for our weight
+        int iWeight = 0;
         Iterator<String> stIter = searchTokenList.iterator();
         while (stIter.hasNext() && i < vecL) {
             String curSearchToken = stIter.next();
@@ -290,9 +331,11 @@ public class Indexer {
                    &&  i < vecL) {
                 i++;
             }
-            if (curSearchToken.compareTo(tokenIDFVector[i].token()) == 0) {
-                searchV[i] = 1;
+            if (curSearchToken.equals(tokenIDFVector[i].token())) {
+                searchV[i] = 1 * weights[iWeight];
+                iWeight++;
             }
+
         }
         
         // iterate through pages and rank then using cosine similarity.
@@ -308,7 +351,6 @@ public class Indexer {
         }
         // sort the search results by score descending.
         searchResults.sort((a, b) ->  (b.score() < a.score() ? -1 : 1));
-
 
         return searchResults;
     }
@@ -332,6 +374,12 @@ public class Indexer {
     public List<SearchResult> rankCombCosSimPageRank(final Set<Page> searchResultSet,
                                 final TreeSet<String> searchTokenList) {
         List<SearchResult> searchResults = new ArrayList<>(searchResultSet.size());
+        // Check if our searchResultSet is empty if it is return empty 
+        // SearchResult list.
+        if (searchResultSet.size() == 0) {
+            return searchResults;
+        }
+
         /** How much the normalized cosine scores weigh in contrast to 
          * the corresponding pagerank score */
         final double cosWeight = 0.75;
