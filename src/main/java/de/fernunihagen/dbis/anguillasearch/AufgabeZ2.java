@@ -44,7 +44,7 @@ public class AufgabeZ2 {
         cleanLinks(crawledPages);
 
         // execute search
-        String searchQuery = "flavor";
+        String searchQuery = "caerphilly";
         List<SearchResult> searchResults = index.searchQuery(searchQuery, 0);
 
         //generate urlMap
@@ -131,17 +131,17 @@ public class AufgabeZ2 {
                                 graphWidth -500,
                                 graphHeight-200,
                                 legendWidth,
-                                20,
-                                "default;verticalAlign=top");
+                                40,
+                                "default;verticalAlign=top;fontSize=30");
 
             graph.insertVertex(parent,
                                 "Legend Content",
                                 legendHTML,
                                 graphWidth-500,
-                                graphHeight-180,
+                                graphHeight-160,
                                 legendWidth,
                                 100,
-                                "default;align=left;verticalAlign=top");
+                                "default;align=left;verticalAlign=top;fontSize=15");
         }
 		finally
 		{
