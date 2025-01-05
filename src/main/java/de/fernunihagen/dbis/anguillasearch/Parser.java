@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -61,9 +62,14 @@ public abstract class Parser {
     public static String rmStopWords(final String inputString) {
         String workString = inputString;
         if (stopWordRegex == null) {
-            try {
-                List<String> stopWords = Files.readAllLines(Paths
-                                                        .get("stopwords.txt"));
+                // Stop word list source is CoreNLP
+                // https://github.com/stanfordnlp/CoreNLP/blob/main/src/edu/ \
+                // stanford/nlp/coref/data/WordLists.java
+                String stopWordString = "a an the of at on upon in to from out"
+                                        +" as so such or and those this these"
+                                        +" that for is was am are 's been were";
+                
+                List<String> stopWords = Arrays.asList(stopWordString.split(" "));
                 //create Regex
                 StringBuilder strB = new StringBuilder();
                 strB.append("\\b(");
@@ -74,10 +80,6 @@ public abstract class Parser {
                 strB.setCharAt(strB.length() - 1, ')');
                 strB.append("\\b");
                 stopWordRegex = strB.toString();
-            } catch (IOException e) {
-                System.out.println("Failed to load Stopwordlist.");
-                System.out.println(e.toString());
-            }
         }
         workString = workString.replaceAll(stopWordRegex, "");
         return workString;

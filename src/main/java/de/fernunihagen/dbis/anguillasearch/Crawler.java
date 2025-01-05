@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,8 +20,6 @@ import java.util.Queue;
  * or by providing a String array with the Seed-URLs directly.
  */
 public class Crawler {
-    /** LOGGER */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Crawler.class);
     /** The Number of Links the crawler has found. */
     private int numLinks = 0;
     /** The queue of URLs the crawler has still process. */
@@ -86,18 +82,16 @@ public class Crawler {
                     numLinks++;
                 }
             } catch (IOException e) {
-                LOGGER.warn("Failed to fetch: {}", curURL);
+                System.out.println("Failed to fetch: " + curURL);
             }
             if (crawledPages.size() % 100 == 0) {
-                if(LOGGER.isInfoEnabled()) {
-                    LOGGER.info("Crawled {} pages.", crawledPages.size());
-                }
+                System.out.println("Crawled " + crawledPages.size() + " pages");
             }
         }
         //Document curSite = Jsoup.connect(null)
         long stopTimeStamp = System.currentTimeMillis();
         long crawlTime = stopTimeStamp - startTimestamp;
-        LOGGER.info("Crawling and lemmatizing took: {} ms", crawlTime);
+        System.out.println("Crawling and lemmatizing took: " + crawlTime + "ms");
         return crawledPages.size();
     }
 

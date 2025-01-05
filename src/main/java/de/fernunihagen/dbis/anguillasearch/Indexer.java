@@ -11,9 +11,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 
 
 /**
@@ -24,8 +21,6 @@ import java.util.TreeSet;
  * 
  */
 public class Indexer { 
-    /** Creating Logger */
-    //private static final Logger LOGGER = LoggerFactory.getLogger(Indexer.class);
     /** The Crawler provides us with a list of fetched pages.*/
     private Crawler crawler;
     /** A list of pages which is used as data source.*/
