@@ -1,3 +1,84 @@
+# AnguillaSearch
+
+A simple command line search engine. 
+
+## Description
+
+AnguillaSearch crawls the  specified net starting from the seed URLs 
+
+## Installation
+You need the following dependencies:
+- Java 17
+- Maven
+- Git
+For Windows:
+- Docker Desktop 
+- WSL2
+For Linux:
+- Docker-Engine
+- Docker-Compose
+- Git
+### Option 1 (You have the libraries and the intranet is reachable)
+- Download latest release
+- Move the program into the folder which contains the libs folder
+- Run the program with ``java -jar ./anguillasearch-release.jar``
+### Option 2 (You don't have the libraries and the intranet)
+- If you are on windows use your WSL2 virtual machine
+- Clone the project using ``git clone https://git.propra-prod1.fernuni-hagen.de/propra/ws24-25/q7062150.git``
+- Navigate into the cloned repository
+- Install libs with command :
+  ``mvn install dependency:copy-dependencies -Dmaven.test.skip``
+- Start intranet using the following command:
+  ``docker compose -f docker-compose-intranet.yml up -d``
+- Pull the docker image using the command:
+    ``docker login registry.propra-prod1.fernuni-hagen.de``
+- Pull the latest image from the registry:
+  ``docker image pull registry.propra-prod1.fernuni-hagen.de/propra/ws24-25/q7062150/anguilla-search:latest``
+- Create logs folder otherwise it will be created with root privileges and you will get error messages:
+  ``mkdir logs ``
+- Navigate to the root directory of your project folder and execute the container.
+    ```bash
+    docker run --rm -it \
+    --net anguilla-search-dev --ip 172.32.0.8 \
+    --dns="172.32.0.2" --dns="8.8.8.8" --dns="4.4.4.4" \
+    -u $(id -u):$(id -g) \
+    --mount type=bind,source="$(pwd)"/target/libs,target=/opt/anguillasearch/libs,readonly \
+    --mount type=bind,source="$(pwd)"/logs,target=/opt/anguillasearch/logs \
+    --mount type=bind,source="$(pwd)"/figures,target=/opt/anguillasearch/figures \
+    registry.propra-prod1.fernuni-hagen.de/propra/ws24-25/q7062150/anguilla-search:latest
+    ```
+## Usage
+
+The program supports the following command line arguments:
+| Argument | Value | Default | Description |
+| -------- | ----- | ------- | ----------- |
+| --help   |       |         | Prints help |
+| --color  |       | off     | Use ANSI-Colors to highlight searchresults |
+| -r       | 0 to 3| 2       | Rank result by: <br> 0 - TF-IDF <br> 1 - Cosine Similarity <br> 2 - Combination of cosine similarity and Pagerank <br> 3 - Cosine Similarity with weights <br>&nbsp;If a specific word is multiple times in the searchquery it will be weighted accordingly.
+|  last arg|       | cheesy1 | Provide a path to a JSON-file or seed URLs sperated by " "
+
+The last argument can be a filepath to a json file or seedurls seperated by spaces.
+## Example
+We want to utilize colors and use ranking method 3. We supply the seed URLs of chessy2 with the last argument:
+
+```java -jar ./target/anguillasearch-1.0.0-SNAPSHOT.jar --color -r 3 "http://shropshireblue24.cheesy2 http://burrata.cheesy2 http://stilton24.cheesy2"```
+
+
+with the docker container:
+
+
+    docker run --rm -it \
+    --net anguilla-search-dev --ip 172.32.0.8 \
+    --dns="172.32.0.2" --dns="8.8.8.8" --dns="4.4.4.4" \
+    -u $(id -u):$(id -g) \
+    --mount type=bind,source="$(pwd)"/target/libs,target=/opt/anguillasearch/libs,readonly \
+    --mount type=bind,source="$(pwd)"/logs,target=/opt/anguillasearch/logs \
+    --mount type=bind,source="$(pwd)"/figures,target=/opt/anguillasearch/figures \
+    registry.propra-prod1.fernuni-hagen.de/propra/ws24-25/q7062150/anguilla-search:latest \
+    --color -r 3 "http://shropshireblue24.cheesy2 http://burrata.cheesy2 http://stilton24.cheesy2"
+
+
+
 # Anguilla Search (Dev)
 
 This is a complete programming environment with minimal dependencies. VSCode is provided as a web application ([Coder Server](https://coder.com)) with all the necessary extensions.
