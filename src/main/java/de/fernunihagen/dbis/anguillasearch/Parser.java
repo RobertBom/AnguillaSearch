@@ -1,8 +1,6 @@
 package de.fernunihagen.dbis.anguillasearch;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -101,7 +99,8 @@ public abstract class Parser {
 
         // remove \, |, and punctiation marks.
         // – U+2013 : EN DASH not removed
-        workString = workString.replaceAll("[\\\\|.!,:\\-?\\&]", "");
+        workString = Normalizer.normalize(workString, Normalizer.Form.NFD);
+        workString = workString.replaceAll("[\\\\|.!,:\\-?\\&]\'", "");
         workString = workString.toLowerCase();
 
         //remove StopWords

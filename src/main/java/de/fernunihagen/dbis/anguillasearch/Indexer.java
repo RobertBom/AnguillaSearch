@@ -335,6 +335,7 @@ public class Indexer {
             if (curSearchToken.equals(tokenIDFVector[i].token())) {
                 searchV[i] = 1 * weights[iWeight];
                 iWeight++;
+                
             }
         }
 
@@ -494,6 +495,10 @@ public class Indexer {
             tokenList.get(i).token, tokenList.get(i).count);
         }
     }
+    /**
+     * Prints the searchResults with their respective Score to the console
+     * @param searchResults list of searchresults which should be printed.
+     */
     public void printSearchResults(List<SearchResult> searchResults) {
         for (SearchResult sr : searchResults) {
             System.out.format("URL: %-35s\tScore: %f%n", sr.url(), sr.score());

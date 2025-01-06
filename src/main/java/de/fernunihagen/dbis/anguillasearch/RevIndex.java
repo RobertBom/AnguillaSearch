@@ -6,8 +6,9 @@ import java.util.TreeMap;
 
 public class RevIndex {
     /** A Map provides the needed functionality for the reverseIndex.
-        The value a is map again, with url as the key and the corresponding
-        Page object.*/
+        The value is a map again, with url as the key and the corresponding
+        Page object. Map<Token, Map<URL, Page>>.
+        */
     private Map<String, Map<String, Page>> indexMap = new TreeMap<>();
 
     /**

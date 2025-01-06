@@ -92,20 +92,12 @@ public class PageRank {
                 delta += Math.abs(oldPageR - newPageR);
                 // save new PageRank to out new map
                 newPageRankMap.put(prEntry.getKey(), newPageR);
-                //System.out.format("URL: %-50s old PR: %5f new PR: %5f%n", curPage, oldPageR, newPageR);
                 
             }
             // switch old pageRanks with new pageRanks
             pageRankMap = newPageRankMap;
             iterationCount++;
         } while (delta > EPSILON && iterationCount < MAXPAGERANKIT);
-        // System.out.println(iterationCount);
-        double pageRankSum = pageRankMap.values()
-                                .stream()
-                                .mapToDouble(Double::doubleValue)
-                                .sum();
-        double avg = pageRankSum / pageRankMap.size();
-        // System.out.println(pageRankMap.size());
     }
     /**
      * Returns the total amount of inbound links.
