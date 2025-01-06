@@ -27,9 +27,6 @@ public final class AnguillaSearch {
      */
     public static void main(final String[] args) {
 
-        // Print start message to logger
-        //LOGGER.info("Starting AnguillaSearch...");
-
         /*
          * Set the java.awt.headless property to true to prevent awt from 
          * opening windows.
@@ -43,6 +40,10 @@ public final class AnguillaSearch {
         int rankMode = 2;
 
         Map<String, String> argMap = argsParser(args);
+        if(argMap.get("--help") != null) {
+            printHelp();
+            System.exit(0);
+        }
         if (argMap.get("-r") != null) {
             rankMode = Integer.parseInt(argMap.get("-r"));
         }
@@ -69,7 +70,7 @@ public final class AnguillaSearch {
                                + " seedURLs: " + String.join(", ", seedURLs));
 
         }
-        if (argMap.get("-color") != null) {
+        if (argMap.get("--color") != null) {
             color = true;
             System.out.println("Color Outpout loaded");
         }
@@ -133,8 +134,9 @@ public final class AnguillaSearch {
         int argCount = args.length;
         // every argument support at maximum one parameter so we can use bool.
         Map<String, Boolean> validArgs = new HashMap<>();
+        validArgs.put("--help", false);
         validArgs.put("-r", true);
-        validArgs.put("-color", false);
+        validArgs.put("--color", false);
 
         if (argCount == 0) {
             return argMap;
@@ -178,8 +180,8 @@ public final class AnguillaSearch {
                                     + " parameter.");
                 System.out.println("0 - TF-IDF ranking.");
                 System.out.println("1 - Cosine similarity ranking.");
-                System.out.println("2 - Combination of TF-IDF and cosine "
-                                    + "similarity.");
+                System.out.println("2 - Combination of TF-IDF and "
+                                    + "Pagerank.");
                 System.out.println("3 - Cosine similarity ranking with weights. "
                                     + "If a specific word is multiple times in the searchquery it will be weighted accordingly.");
                 System.exit(2);
@@ -273,6 +275,29 @@ public final class AnguillaSearch {
         System.exit(1);
     }
     private static void printHelp() {
+        System.out.println("AnguillaSearch");
+        System.out.println("Usage: java -jar AnguillaSearch.jar [Arguments]"
+                            + " {path to JSON or seed URLs}");
+        System.out.println("Supported arguments:");
+        String arg = "--help";
+        String desc = "Prints help";
+        System.out.format("%-20s %s%n", arg, desc);
+        arg = "--color";
+        desc = "Enables ANSI-Colors to highlight searchresults";
+        System.out.format("%-20s %s%n", arg, desc);
+        arg = "-r 0 to 3";
+        desc = "Rank results by";
+        System.out.format("%-20s %s%n", arg, desc);
+        arg = "";
+        desc = "0 - TF-IDF";
+        System.out.format("%-20s %s%n", arg, desc);
+        System.out.format("%-20s %s%n", arg, desc);
+        desc = "1 - Cosine Similarity ";
+        System.out.format("%-20s %s%n", arg, desc);
+        desc = "2 - Combination of cosine similarity and Pagerank ";
+        System.out.format("%-20s %s%n", arg, desc);
+        desc = "3 - Cosine Similarity with weights ";
+        System.out.format("%-20s %s%n", arg, desc);
 
     }
 }
