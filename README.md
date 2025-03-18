@@ -6,6 +6,39 @@ A simple command line search engine.
 
 AnguillaSearch crawls the  specified net starting from the seed URLs 
 
+https://github.com/user-attachments/assets/591f764a-98f4-403b-8e64-7eb0ec349a96
+
+## Usage
+
+The program supports the following command line arguments:
+| Argument | Value | Default | Description |
+| -------- | ----- | ------- | ----------- |
+| --help   |       |         | Prints help |
+| --color  |       | off     | Use ANSI-Colors to highlight searchresults |
+| -r       | 0 to 3| 2       | Rank result by: <br> 0 - TF-IDF <br> 1 - Cosine Similarity <br> 2 - Combination of cosine similarity and Pagerank <br> 3 - Cosine Similarity with weights <br>&nbsp;If a specific word is multiple times in the searchquery it will be weighted accordingly.
+|  last arg|       | cheesy1 | Provide a path to a JSON-file or seed URLs sperated by " "
+
+The last argument can be a filepath to a json file or seedurls seperated by spaces.
+## Example
+We want to utilize colors and use ranking method 3. We supply the seed URLs of chessy2 with the last argument:
+
+```java -jar ./target/anguillasearch-1.0.0-SNAPSHOT.jar --color -r 3 "http://shropshireblue24.cheesy2 http://burrata.cheesy2 http://stilton24.cheesy2"```
+
+
+with the docker container:
+
+
+    docker run --rm -it \
+    --net anguilla-search-dev --ip 172.32.0.8 \
+    --dns="172.32.0.2" --dns="8.8.8.8" --dns="4.4.4.4" \
+    -u $(id -u):$(id -g) \
+    --mount type=bind,source="$(pwd)"/target/libs,target=/opt/anguillasearch/libs,readonly \
+    --mount type=bind,source="$(pwd)"/logs,target=/opt/anguillasearch/logs \
+    --mount type=bind,source="$(pwd)"/figures,target=/opt/anguillasearch/figures \
+    registry.propra-prod1.fernuni-hagen.de/propra/ws24-25/q7062150/anguilla-search:latest \
+    --color -r 3 "http://shropshireblue24.cheesy2 http://burrata.cheesy2 http://stilton24.cheesy2"
+
+
 ## Installation
 You need the following dependencies:
 - Java 17
@@ -47,39 +80,12 @@ For Linux:
     --mount type=bind,source="$(pwd)"/figures,target=/opt/anguillasearch/figures \
     registry.propra-prod1.fernuni-hagen.de/propra/ws24-25/q7062150/anguilla-search:latest
     ```
-## Usage
-
-The program supports the following command line arguments:
-| Argument | Value | Default | Description |
-| -------- | ----- | ------- | ----------- |
-| --help   |       |         | Prints help |
-| --color  |       | off     | Use ANSI-Colors to highlight searchresults |
-| -r       | 0 to 3| 2       | Rank result by: <br> 0 - TF-IDF <br> 1 - Cosine Similarity <br> 2 - Combination of cosine similarity and Pagerank <br> 3 - Cosine Similarity with weights <br>&nbsp;If a specific word is multiple times in the searchquery it will be weighted accordingly.
-|  last arg|       | cheesy1 | Provide a path to a JSON-file or seed URLs sperated by " "
-
-The last argument can be a filepath to a json file or seedurls seperated by spaces.
-## Example
-We want to utilize colors and use ranking method 3. We supply the seed URLs of chessy2 with the last argument:
-
-```java -jar ./target/anguillasearch-1.0.0-SNAPSHOT.jar --color -r 3 "http://shropshireblue24.cheesy2 http://burrata.cheesy2 http://stilton24.cheesy2"```
-
-
-with the docker container:
-
-
-    docker run --rm -it \
-    --net anguilla-search-dev --ip 172.32.0.8 \
-    --dns="172.32.0.2" --dns="8.8.8.8" --dns="4.4.4.4" \
-    -u $(id -u):$(id -g) \
-    --mount type=bind,source="$(pwd)"/target/libs,target=/opt/anguillasearch/libs,readonly \
-    --mount type=bind,source="$(pwd)"/logs,target=/opt/anguillasearch/logs \
-    --mount type=bind,source="$(pwd)"/figures,target=/opt/anguillasearch/figures \
-    registry.propra-prod1.fernuni-hagen.de/propra/ws24-25/q7062150/anguilla-search:latest \
-    --color -r 3 "http://shropshireblue24.cheesy2 http://burrata.cheesy2 http://stilton24.cheesy2"
-
 
 
 # Anguilla Search (Dev)
+
+
+
 
 This is a complete programming environment with minimal dependencies. VSCode is provided as a web application ([Coder Server](https://coder.com)) with all the necessary extensions.
  In addition, a [Devcontainers](https://code.visualstudio.com/docs/devcontainers/containers) configuration is included, which also provides a ready to use environment in VSCode with just a few clicks so that you can start programming immediately.
